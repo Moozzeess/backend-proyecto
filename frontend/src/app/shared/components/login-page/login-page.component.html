@@ -1,0 +1,194 @@
+<div class="login-container">
+    <!-- BLOBS DECORATIVOS -->
+    <div class="blob bg-yellow-300 w-96 h-96 top-[-120px] left-[-120px] absolute"></div>
+    <div class="blob bg-pink-500 w-96 h-96 bottom-[-120px] right-[-120px] absolute"></div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="min-h-screen flex items-center justify-center p-6 relative z-10">
+        <div class="glass w-full max-w-7xl rounded-[40px] overflow-hidden shadow-2xl">
+            <div class="grid lg:grid-cols-2">
+                <!-- PANEL IZQUIERDO -->
+                <div class="hidden lg:flex flex-col justify-center items-center p-14">
+                    <div class="text-center">
+                        <h1 routerLink="/" class="text-6xl font-extrabold text-black cursor-pointer select-none">
+                            Pizza Pizza
+                        </h1>
+                        <p class="mt-6 text-black/80 text-xl max-w-md mx-auto">
+                            Gestiona pedidos, clientes y operaciones desde una sola plataforma.
+                        </p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591"
+                        alt="Pizza Flotante decorativa"
+                        class="pizza-float w-[520px] mt-10 rounded-full shadow-2xl select-none">
+                </div>
+
+                <!-- PANEL DERECHO -->
+                <div class="bg-white p-10 lg:p-16 flex items-center">
+                    <div class="w-full max-w-md mx-auto">
+                        
+                        <!-- Encabezados alternables -->
+                        <h2 class="text-4xl font-extrabold text-gray-800">
+                            {{ modoRegistro() ? 'Crea tu Cuenta' : 'Bienvenido' }}
+                        </h2>
+                        <p class="text-gray-500 mt-3">
+                            {{ modoRegistro() ? 'Regístrate para realizar tus pedidos favoritos.' : 'Inicia sesión para continuar.' }}
+                        </p>
+
+                        <!-- FORMULARIO DE INICIO DE SESIÓN -->
+                        <form *ngIf="!modoRegistro()" (ngSubmit)="iniciarSesion()" class="mt-8">
+                            <div>
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Correo electrónico
+                                </label>
+                                <input type="email" name="correo" [ngModel]="correo()"
+                                    (ngModelChange)="correo.set($event)" required placeholder="cliente@pizza.com"
+                                    class="input-style">
+                            </div>
+                            <div class="mt-5">
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Contraseña
+                                </label>
+                                <div class="relative">
+                                    <input [type]="verContrasenia() ? 'text' : 'password'" name="contrasenia" [ngModel]="contrasenia()"
+                                        (ngModelChange)="contrasenia.set($event)" required placeholder="********"
+                                        class="input-style pr-12">
+                                    <button type="button" (click)="verContrasenia.set(!verContrasenia())" 
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer select-none outline-none text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center">
+                                        <svg *ngIf="!verContrasenia()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                        <svg *ngIf="verContrasenia()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mt-5">
+                                <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                                    <input type="checkbox" class="cursor-pointer">
+                                    Recordarme
+                                </label>
+                                <a href="#" class="text-[#d6254d] font-medium">
+                                    ¿Olvidaste tu contraseña?
+                                </a>
+                            </div>
+
+                            <div *ngIf="mensajeError() && !modoRegistro()" class="mt-4 p-3 bg-[#ff5475]/10 border border-[#d6254d]/20 text-[#d6254d] rounded-xl text-sm font-medium">
+                                {{ mensajeError() }}
+                            </div>
+
+                            <button type="submit"
+                                class="btn-login w-full py-4 rounded-2xl text-white font-bold mt-8 shadow-lg cursor-pointer">
+                                Iniciar Sesión
+                            </button>
+                        </form>
+
+                        <!-- FORMULARIO DE REGISTRO (CREAR CUENTA) -->
+                        <form *ngIf="modoRegistro()" (ngSubmit)="registrarUsuario()" class="mt-8">
+                            <div>
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Nombre completo
+                                </label>
+                                <input type="text" name="nombre" [ngModel]="nombre()"
+                                    (ngModelChange)="nombre.set($event)" required placeholder="Tu nombre y apellido"
+                                    class="input-style">
+                            </div>
+                            <div class="mt-5">
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Correo electrónico
+                                </label>
+                                <input type="email" name="correo" [ngModel]="correo()"
+                                    (ngModelChange)="correo.set($event)" required placeholder="ejemplo@pizza.com"
+                                    class="input-style">
+                            </div>
+                            <div class="mt-5">
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Contraseña
+                                </label>
+                                <div class="relative">
+                                    <input [type]="verContrasenia() ? 'text' : 'password'" name="contrasenia" [ngModel]="contrasenia()"
+                                        (ngModelChange)="contrasenia.set($event)" required placeholder="********"
+                                        class="input-style pr-12">
+                                    <button type="button" (click)="verContrasenia.set(!verContrasenia())" 
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer select-none outline-none text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center">
+                                        <svg *ngIf="!verContrasenia()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                        <svg *ngIf="verContrasenia()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-5">
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Confirmar contraseña
+                                </label>
+                                <div class="relative">
+                                    <input [type]="verConfirmarContrasenia() ? 'text' : 'password'" name="confirmarContrasenia" [ngModel]="confirmarContrasenia()"
+                                        (ngModelChange)="confirmarContrasenia.set($event)" required placeholder="********"
+                                        class="input-style pr-12">
+                                    <button type="button" (click)="verConfirmarContrasenia.set(!verConfirmarContrasenia())" 
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer select-none outline-none text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center">
+                                        <svg *ngIf="!verConfirmarContrasenia()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                        <svg *ngIf="verConfirmarContrasenia()" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.815 7.815 3 3m-3-3-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div *ngIf="mensajeError() && modoRegistro()" class="mt-4 p-3 bg-[#ff5475]/10 border border-[#d6254d]/20 text-[#d6254d] rounded-xl text-sm font-medium">
+                                {{ mensajeError() }}
+                            </div>
+
+                            <div *ngIf="mensajeExito()" class="mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-xl text-sm font-medium">
+                                {{ mensajeExito() }}
+                            </div>
+
+                            <button type="submit"
+                                class="btn-login w-full py-4 rounded-2xl text-white font-bold mt-8 shadow-lg cursor-pointer">
+                                Crear Cuenta
+                            </button>
+                        </form>
+
+                        <!-- SEPARADOR -->
+                        <div class="flex items-center gap-4 my-8">
+                            <div class="h-px bg-gray-200 flex-1"></div>
+                            <span class="text-gray-400 text-sm">O continúa con</span>
+                            <div class="h-px bg-gray-200 flex-1"></div>
+                        </div>
+
+                        <!-- LOGIN SOCIAL -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <button
+                                class="border border-gray-200 py-4 rounded-2xl font-medium hover:bg-gray-50 cursor-pointer">
+                                Google
+                            </button>
+                            <button
+                                class="border border-gray-200 py-4 rounded-2xl font-medium hover:bg-gray-50 cursor-pointer">
+                                Facebook
+                            </button>
+                        </div>
+
+                        <!-- REGISTRO / ENLACES DE ALTERNANCIA -->
+                        <p class="text-center text-gray-500 mt-8">
+                            {{ modoRegistro() ? '¿Ya tienes una cuenta?' : '¿No tienes cuenta?' }}
+                            <button 
+                                type="button" 
+                                (click)="alternarModo()" 
+                                class="font-bold text-[#d6254d] border-none bg-none cursor-pointer underline ml-1">
+                                {{ modoRegistro() ? 'Iniciar sesión' : 'Crear cuenta' }}
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,418 @@
+<div class="max-w-7xl mx-auto p-4 md:p-6 bg-slate-50/50 min-h-screen">
+    <!-- NOTIFICACIONES LOCALES -->
+    <div *ngIf="mensajeExito" class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl font-semibold text-sm animate-fadeIn">
+        {{ mensajeExito }}
+    </div>
+    <div *ngIf="mensajeError" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl font-semibold text-sm animate-fadeIn">
+        {{ mensajeError }}
+    </div>
+
+    <!-- HEADER -->
+    <div class="rounded-2xl p-6 text-white shadow-lg bg-gradient-to-r from-[#d6254d] via-[#ff5475] to-[#ff9036]">
+        <div class="flex justify-between items-center flex-wrap gap-3">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">
+                    Pizza Pizza CFDI Center
+                </h1>
+                <p class="mt-1 text-xs opacity-90 font-medium">
+                    Facturación Electrónica CFDI 4.0
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <button (click)="volverAlPanel()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer text-xs">
+                    Volver al Panel
+                </button>
+                <button *ngIf="pedidoSeleccionado && pasoActivo !== 5" (click)="timbrarCFDI()" class="bg-white text-[#d6254d] hover:bg-gray-100 font-bold px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer text-xs">
+                    Timbrar CFDI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEPPER -->
+    <div class="flex justify-between items-center mt-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-wrap gap-3">
+        <div class="flex items-center gap-2 font-semibold text-xs transition-opacity" [class.opacity-40]="pasoActivo < 1">
+            <div class="w-7 h-7 rounded-full flex justify-center items-center font-bold" 
+                 [ngClass]="{'bg-[#d6254d] text-white': pasoActivo >= 1, 'bg-gray-200 text-gray-600': pasoActivo < 1}">1</div>
+            <span>Pedido</span>
+        </div>
+        <div class="flex items-center gap-2 font-semibold text-xs transition-opacity" [class.opacity-40]="pasoActivo < 2">
+            <div class="w-7 h-7 rounded-full flex justify-center items-center font-bold" 
+                 [ngClass]="{'bg-[#d6254d] text-white': pasoActivo >= 2, 'bg-gray-200 text-gray-600': pasoActivo < 2}">2</div>
+            <span>Fiscales</span>
+        </div>
+        <div class="flex items-center gap-2 font-semibold text-xs transition-opacity" [class.opacity-40]="pasoActivo < 3">
+            <div class="w-7 h-7 rounded-full flex justify-center items-center font-bold" 
+                 [ngClass]="{'bg-[#d6254d] text-white': pasoActivo >= 3, 'bg-gray-200 text-gray-600': pasoActivo < 3}">3</div>
+            <span>Conceptos</span>
+        </div>
+        <div class="flex items-center gap-2 font-semibold text-xs transition-opacity" [class.opacity-40]="pasoActivo < 4">
+            <div class="w-7 h-7 rounded-full flex justify-center items-center font-bold" 
+                 [ngClass]="{'bg-[#d6254d] text-white': pasoActivo >= 4, 'bg-gray-200 text-gray-600': pasoActivo < 4}">4</div>
+            <span>SAT</span>
+        </div>
+        <div class="flex items-center gap-2 font-semibold text-xs transition-opacity" [class.opacity-40]="pasoActivo < 5">
+            <div class="w-7 h-7 rounded-full flex justify-center items-center font-bold" 
+                 [ngClass]="{'bg-[#d6254d] text-white': pasoActivo >= 5, 'bg-gray-200 text-gray-600': pasoActivo < 5}">5</div>
+            <span>Descarga</span>
+        </div>
+    </div>
+
+    <!-- MAIN GRID CONTENT -->
+    <div class="grid lg:grid-cols-5 gap-6 mt-6">
+        
+        <!-- COLUMNA IZQUIERDA: FORMULARIOS Y PROCESO -->
+        <div class="lg:col-span-3 space-y-6">
+            
+            <!-- PASO 1: SELECCIONAR PEDIDO & BÚSQUEDA DE TICKET -->
+            <div *ngIf="pasoActivo === 1" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <div>
+                    <h2 class="font-extrabold text-xl text-gray-800">Seleccionar Pedido</h2>
+                    <p class="text-xs text-gray-500">Selecciona un pedido pagado para iniciar la emisión del CFDI.</p>
+                </div>
+
+                <!-- BÚSQUEDA DE TICKET -->
+                <div *ngIf="rolActivo === 'empleado' || rolActivo === 'admin'" class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Buscar Ticket de Venta</label>
+                    <div class="flex gap-2">
+                        <input type="text" [(ngModel)]="idTicketBusqueda" placeholder="Ej. PED-8893" 
+                               class="flex-1 px-3 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs">
+                        <button (click)="buscarTicket()" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg text-xs hover:bg-slate-900 transition-all cursor-pointer">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                    <div *ngFor="let pedido of servicioPedidos.historialPedidos()" 
+                         (click)="seleccionarPedido(pedido)"
+                         class="p-3 rounded-lg border border-gray-150 hover:border-[#ff5475] hover:bg-red-50/5 cursor-pointer transition-all flex justify-between items-center text-xs"
+                         [ngClass]="{'border-[#d6254d] bg-red-50/10': pedidoSeleccionado?.id === pedido.id}">
+                         <div>
+                            <span class="font-black text-gray-800">{{ pedido.id }}</span>
+                            <span class="text-[10px] text-gray-450 block mt-0.5">{{ pedido.fechaHora }}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-gray-850 block">${{ pedido.total }}</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider"
+                                  [ngClass]="{
+                                      'bg-green-50 text-green-600': pedido.estado === 'pagado' || pedido.estado === 'Entregado',
+                                      'bg-red-50 text-red-600': pedido.estado === 'cancelado',
+                                      'bg-yellow-50 text-yellow-600': pedido.estado !== 'pagado' && pedido.estado !== 'Entregado' && pedido.estado !== 'cancelado'
+                                  }">
+                                {{ pedido.estado }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: DATOS FISCALES -->
+            <div *ngIf="pasoActivo === 2" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <div class="flex justify-between items-center flex-wrap gap-2">
+                    <h2 class="font-extrabold text-xl text-gray-800">Datos Fiscales</h2>
+                    <!-- Seleccionar Cliente Frecuente -->
+                    <div *ngIf="rolActivo === 'empleado' || rolActivo === 'admin'">
+                        <select (change)="seleccionarCliente(clientesSimulados[$any($event.target).value])"
+                                class="px-3 py-1.5 bg-slate-50 border border-slate-250 text-gray-600 rounded-lg text-[10px] font-bold focus:outline-none">
+                            <option value="" disabled selected>Cliente Frecuente</option>
+                            <option *ngFor="let c of clientesSimulados; let idx = index" [value]="idx">
+                                {{ c.razonSocial }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">RFC</label>
+                        <input type="text" [(ngModel)]="datosFiscales.rfc" placeholder="XAXX010101000"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Razón Social</label>
+                        <input type="text" [(ngModel)]="datosFiscales.razonSocial" placeholder="Público General"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Código Postal</label>
+                        <input type="text" [(ngModel)]="datosFiscales.codigoPostal" placeholder="04000"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Correo Electrónico</label>
+                        <input type="email" [(ngModel)]="datosFiscales.correo" placeholder="cliente@correo.com"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Régimen Fiscal</label>
+                        <select [(ngModel)]="datosFiscales.regimenFiscal"
+                                class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs bg-white">
+                            <option value="601 - General de Ley Personas Morales">601 - General de Ley Personas Morales</option>
+                            <option value="612 - Personas Físicas con Actividades Empresariales y Profesionales">612 - Personas Físicas con Actividades Empresariales y Profesionales</option>
+                            <option value="616 - Sin obligaciones fiscales">616 - Sin obligaciones fiscales</option>
+                            <option value="626 - Régimen Simplificado de Confianza">626 - Régimen Simplificado de Confianza</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Uso de CFDI</label>
+                        <select [(ngModel)]="datosFiscales.usoCfdi"
+                                class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] text-xs bg-white">
+                            <option value="G03 - Gastos en general">G03 - Gastos en general</option>
+                            <option value="D01 - Honorarios médicos">D01 - Honorarios médicos</option>
+                            <option value="P01 - Por definir">P01 - Por definir</option>
+                            <option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-4 pt-3 border-t border-gray-100">
+                    <button (click)="retrocederPaso()" class="w-1/2 px-4 py-2 bg-gray-100 text-gray-600 font-bold rounded-lg text-xs hover:bg-gray-200 transition-colors">
+                        Atrás
+                    </button>
+                    <button (click)="siguientePaso()" class="w-1/2 px-4 py-2 bg-[#d6254d] text-white font-bold rounded-lg text-xs hover:bg-[#ff5475] transition-colors">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 3 Y 4: CONCEPTOS E IMPUESTOS / SAT -->
+            <div *ngIf="pasoActivo === 3 || pasoActivo === 4" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <div *ngIf="pasoActivo === 3">
+                    <h2 class="font-extrabold text-xl text-gray-800 mb-3">Conceptos Facturados</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-gray-200 text-gray-500 text-xs font-semibold">
+                                    <th class="p-2.5">Cant.</th>
+                                    <th class="p-2.5">Descripción</th>
+                                    <th class="p-2.5">Precio Unitario</th>
+                                    <th class="p-2.5">IVA</th>
+                                    <th class="p-2.5 text-right">Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of pedidoSeleccionado?.productos" class="border-b border-gray-100 text-xs">
+                                    <td class="p-2.5 font-semibold text-gray-600">{{ item.cantidad }}</td>
+                                    <td class="p-2.5 text-gray-800 font-bold">{{ item.producto.nombre }}</td>
+                                    <td class="p-2.5 text-gray-500">${{ item.producto.precio }}</td>
+                                    <td class="p-2.5 text-gray-400">16%</td>
+                                    <td class="p-2.5 text-right font-black text-gray-800">${{ item.producto.precio * item.cantidad }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div *ngIf="pasoActivo === 4" class="space-y-3">
+                    <h2 class="font-extrabold text-xl text-gray-800">Conexión con el SAT</h2>
+                    <div class="flex items-center gap-2.5 bg-green-50 border border-green-200 rounded-xl p-3 text-green-700 font-semibold text-xs">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                        SAT conectado correctamente ante la API de firma electrónica
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-4 pt-3 border-t border-gray-100">
+                    <button (click)="retrocederPaso()" class="w-1/2 px-4 py-2 bg-gray-100 text-gray-600 font-bold rounded-lg text-xs">
+                        Atrás
+                    </button>
+                    <button (click)="pasoActivo === 4 ? timbrarCFDI() : siguientePaso()" 
+                            class="w-1/2 px-4 py-2 bg-[#d6254d] text-white font-bold rounded-lg text-xs hover:bg-[#ff5475] transition-colors">
+                        {{ pasoActivo === 4 ? 'Confirmar y Timbrar' : 'Siguiente' }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 5: DESCARGAS Y ACCIONES FINALES -->
+            <div *ngIf="pasoActivo === 5" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <h2 class="font-extrabold text-xl text-gray-800">Factura Timbrada con Éxito</h2>
+                <p class="text-xs text-gray-500">Se han generado el folio digital y el timbre fiscal. Puedes proceder con las descargas.</p>
+                
+                <div class="flex gap-3 flex-wrap">
+                    <button (click)="descargarXML()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg font-bold text-xs hover:bg-green-700 transition-colors cursor-pointer">
+                        Descargar XML
+                    </button>
+                    <button (click)="descargarPDF()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold text-xs hover:bg-blue-700 transition-colors cursor-pointer">
+                        Descargar PDF
+                    </button>
+                    <button (click)="enviarCorreo()" class="bg-slate-800 text-white px-5 py-2.5 rounded-lg font-bold text-xs hover:bg-slate-900 transition-colors cursor-pointer">
+                        Reenviar Correo
+                    </button>
+                    <button (click)="limpiarEstado()" class="bg-gray-100 text-gray-600 px-5 py-2.5 rounded-lg font-bold text-xs hover:bg-gray-200 transition-colors cursor-pointer">
+                        Nueva Factura
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONFIGURACIÓN SAT & PAC (Solo visible para Empleado y Admin, solo modificable por Admin) -->
+            <div *ngIf="rolActivo === 'empleado' || rolActivo === 'admin'" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h3 class="text-lg font-bold text-gray-800">Parámetros del Emisor y PAC (SAT)</h3>
+                    <span class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider"
+                          [ngClass]="rolActivo === 'admin' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'">
+                        {{ rolActivo === 'admin' ? 'Acceso Total' : 'Solo Lectura' }}
+                    </span>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">PAC Autorizado</label>
+                        <input type="text" [(ngModel)]="configuracionSat.pacNombre" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">RFC del PAC</label>
+                        <input type="text" [(ngModel)]="configuracionSat.pacRfc" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Número de Certificado CSD</label>
+                        <input type="text" [(ngModel)]="configuracionSat.certificadoNo" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Vigencia del Certificado</label>
+                        <input type="date" [(ngModel)]="configuracionSat.certificadoVigencia" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Serie CFDI Activa</label>
+                        <input type="text" [(ngModel)]="configuracionSat.serieActiva" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Folio Siguiente</label>
+                        <input type="number" [(ngModel)]="configuracionSat.folioSiguiente" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Régimen Fiscal Emisor</label>
+                        <input type="text" [(ngModel)]="configuracionSat.regimenEmisor" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Razón Social Emisor</label>
+                        <input type="text" [(ngModel)]="configuracionSat.nombreEmisor" [disabled]="rolActivo !== 'admin'"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-xs">
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORIAL DE CFDI EMITIDOS & CANCELACIONES (Sólo visible para Empleado y Admin) -->
+            <div *ngIf="rolActivo === 'empleado' || rolActivo === 'admin'" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-3">
+                <h3 class="text-lg font-bold text-gray-800">Historial de CFDI Emitidos</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 text-gray-400 text-xs font-semibold pb-2">
+                                <th class="py-2.5">Folio</th>
+                                <th class="py-2.5">RFC</th>
+                                <th class="py-2.5">Monto</th>
+                                <th class="py-2.5">Estatus</th>
+                                <th class="py-2.5 text-right" *ngIf="rolActivo === 'admin'">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let fac of listaFacturas" class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors text-xs">
+                                <td class="py-3 font-bold text-gray-700">{{ fac.id }}</td>
+                                <td class="py-3 font-semibold text-gray-600">{{ fac.rfc }}</td>
+                                <td class="py-3 font-black text-gray-800">${{ fac.total }}</td>
+                                <td class="py-3">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                          [ngClass]="{
+                                              'bg-green-50 text-green-600': fac.estado === 'Emitida',
+                                              'bg-red-50 text-red-600': fac.estado === 'Cancelada'
+                                          }">
+                                        {{ fac.estado }}
+                                    </span>
+                                </td>
+                                <td class="py-3 text-right" *ngIf="rolActivo === 'admin'">
+                                    <button *ngIf="fac.estado === 'Emitida'" 
+                                            (click)="cancelarFactura(fac.id)"
+                                            class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-md text-[10px] hover:bg-red-100 transition-colors cursor-pointer">
+                                        Cancelar
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: VISTA PREVIA CFDI (PDF) -->
+        <div class="lg:col-span-2">
+            <div class="sticky top-6 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-[#ff9036] to-[#d6254d] text-white p-4 font-bold text-center text-sm">
+                    Vista Previa CFDI
+                </div>
+                
+                <div class="p-5 space-y-4">
+                    <div class="border-b pb-3">
+                        <h3 class="font-extrabold text-xl text-gray-800">Pizza Pizza</h3>
+                        <!-- Campos de Emisor y Serie/Folio -->
+                        <div class="mt-2 space-y-0.5">
+                            <p class="text-[9px] text-gray-400 font-bold">EMISOR:</p>
+                            <p class="text-xs text-gray-500 font-semibold">{{ configuracionSat.nombreEmisor }}</p>
+                            <p class="text-[10px] text-gray-400">RFC: {{ configuracionSat.rfcEmisor }}</p>
+                            <p class="text-[10px] text-gray-400">Régimen: {{ configuracionSat.regimenEmisor }}</p>
+                            <p class="text-xs text-slate-500 font-semibold mt-1">Serie: {{ configuracionSat.serieActiva }} | Folio: {{ facturaActiva ? facturaActiva.id : configuracionSat.folioSiguiente }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-[9px] text-gray-400 block font-bold uppercase">Receptor del CFDI</span>
+                        <p class="font-bold text-gray-700 text-xs">{{ datosFiscales.razonSocial || 'CLIENTE DEMO' }}</p>
+                        <p class="text-[10px] text-gray-500 font-medium">RFC: {{ datosFiscales.rfc || 'XAXX010101000' }}</p>
+                        <p class="text-[10px] text-gray-400">C.P. {{ datosFiscales.codigoPostal || '04000' }} | Régimen: {{ datosFiscales.regimenFiscal }}</p>
+                    </div>
+
+                    <div class="border-t border-b border-gray-100 py-3">
+                        <table class="w-full text-xs text-gray-600">
+                            <thead>
+                                <tr class="font-bold text-gray-400">
+                                    <th>Concepto</th>
+                                    <th class="text-right">Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of (pedidoSeleccionado?.productos || [])">
+                                    <td class="py-1 text-[11px]">{{ item.producto.nombre }} x{{ item.cantidad }}</td>
+                                    <td class="text-right py-1 font-semibold text-[11px]">${{ item.producto.precio * item.cantidad }}</td>
+                                </tr>
+                                <tr *ngIf="!(pedidoSeleccionado?.productos?.length)">
+                                    <td class="py-1 text-[11px]">Pizza Pepperoni Familiar x2</td>
+                                    <td class="text-right py-1 font-semibold text-[11px]">$498</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pt-1 text-xs space-y-1.5">
+                        <div class="flex justify-between text-gray-500 font-medium">
+                            <span>Subtotal</span>
+                            <span>${{ pedidoSeleccionado ? pedidoSeleccionado.total - Math.round(pedidoSeleccionado.total * 0.16) : 498 }}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-500 font-medium">
+                            <span>IVA (16%)</span>
+                            <span>${{ pedidoSeleccionado ? Math.round(pedidoSeleccionado.total * 0.16) : 79.68 }}</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-black text-[#d6254d]">
+                            <span>Total</span>
+                            <span>${{ pedidoSeleccionado ? pedidoSeleccionado.total : 577.68 }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-100 h-28 rounded-xl flex items-center justify-center font-bold text-xs text-gray-400 uppercase tracking-widest border border-dashed border-gray-200">
+                        Código Bidimensional QR SAT
+                    </div>
+
+                    <div class="text-[10px] text-gray-400 break-all leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <strong>UUID:</strong> {{ facturaActiva ? facturaActiva.uuid : '7A94C1D4-F321-4EBA-A211-19B86FA39CC1' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

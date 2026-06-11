@@ -1,0 +1,89 @@
+<div class="mt-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h3 class="text-2xl font-bold text-gray-800">
+                Corte de Caja Diario
+            </h3>
+            <p class="text-gray-500 text-sm mt-1">
+                Conciliación y envío del balance diario de ventas al administrador
+            </p>
+        </div>
+        <span class="bg-[#d6254d]/20 text-[#d6254d] text-sm font-bold px-4 py-2 rounded-full">
+            Fecha: {{ fechaHoy }}
+        </span>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+        
+        <!-- CARD RESUMEN GENERAL -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <div *ngIf="corteDeHoyEnviado" class="p-6 bg-green-50 border border-green-200 text-green-700 rounded-3xl font-semibold text-sm flex items-center gap-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                El corte de caja de hoy ha sido enviado correctamente y está en espera de aprobación por el administrador.
+            </div>
+
+            <div class="card p-8 border border-gray-100">
+                <h4 class="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-100">Balance del Turno</h4>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Pedidos Entregados</span>
+                        <span class="text-3xl font-black text-gray-800 mt-2 block">
+                            {{ calcularCantidadPedidos() }}
+                        </span>
+                    </div>
+
+                    <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Total Recaudado</span>
+                        <span class="text-3xl font-black text-[#d6254d] mt-2 block">
+                            ${{ calcularTotalVentas() | number }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-semibold text-gray-600 mb-2">Comentarios y Observaciones</label>
+                    <textarea [(ngModel)]="observaciones" 
+                              [disabled]="corteDeHoyEnviado"
+                              placeholder="Escribe aquí cualquier reporte relevante sobre la caja (ej. faltantes, sobrantes, billetes falsificados, etc.)..."
+                              class="w-full h-32 px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff5475] disabled:bg-gray-50 disabled:text-gray-400 text-sm"></textarea>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+                    <button [disabled]="corteDeHoyEnviado || (calcularTotalVentas() === 0)" 
+                            (click)="enviarCorte()"
+                            class="px-8 py-3 bg-[#d6254d] text-white font-bold rounded-2xl shadow-lg hover:bg-[#ff5475] disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none transition-all cursor-pointer text-sm">
+                        Enviar Corte de Caja
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETALLE DE PEDIDOS INCLUIDOS -->
+        <div class="lg:col-span-1">
+            <div class="card p-6 border border-gray-100 space-y-4">
+                <h4 class="text-lg font-bold text-gray-800">Órdenes Facturadas Hoy</h4>
+                <p class="text-xs text-gray-400">Listado de órdenes entregadas que consolidan este corte.</p>
+                
+                <div class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                    <ng-container *ngFor="let pedido of pedidos">
+                        <div *ngIf="pedido.estado === 'Entregado'"
+                             class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex justify-between items-center text-xs">
+                            <div>
+                                <span class="font-bold text-gray-700 block">{{ pedido.id }}</span>
+                                <span class="text-gray-500">{{ pedido.platillo }}</span>
+                            </div>
+                            <span class="font-bold text-gray-700">Entregado</span>
+                        </div>
+                    </ng-container>
+
+                    <div *ngIf="calcularCantidadPedidos() === 0" class="text-center py-6 text-gray-400 text-xs">
+                        Ningún pedido se ha marcado como entregado hoy.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

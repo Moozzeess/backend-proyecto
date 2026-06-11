@@ -1,0 +1,124 @@
+/**
+ * Estilos globales para la página de inicio de sesión (Login Page)
+ * Propósito: Define estilos reutilizables para el componente LoginPage
+ * Ubicación: Se utiliza en el componente LoginPage
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.login-container {
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg,
+            #f6d76b 20%,
+            #ff9036 35%,
+            #d6254d 100%);
+}
+
+/**
+ * Efecto de cristal esmerilado para elementos
+ */
+.glass {
+    background: #f4f3ee;
+    backdrop-filter: blur(18px);
+    border: 1px solid #fff;
+}
+
+/**
+ * Texto con gradiente para el logo
+ */
+.logo-gradient {
+    background: linear-gradient(90deg,
+            #d6254d,
+            #ff5475);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/**
+ * Estilo para campos de entrada
+ */
+.input-style {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: #fff;
+    border: none;
+    outline: none;
+    transition: .3s;
+}
+
+.input-style:focus {
+    box-shadow: 0 0 0 4px rgba(255, 144, 54, .25);
+}
+
+/**
+ * Botón de inicio de sesión con gradiente
+ */
+.btn-login {
+    background: linear-gradient(135deg,
+            #d6254d,
+            #ff5475);
+    transition: .3s;
+}
+
+.btn-login:hover {
+    transform: translateY(-3px);
+}
+
+/**
+ * Animación de flotación para la imagen de pizza
+ */
+.pizza-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-18px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/**
+ * Forma orgánica decorativa
+ */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: .35;
+}
+
+/* Reglas de Modo Oscuro para la Página de Inicio de Sesión */
+.dark .login-container {
+    background: linear-gradient(135deg,
+            #221B1C 0%,
+            #2D2426 100%) !important;
+}
+
+.dark .glass {
+    background: rgba(45, 36, 38, 0.8) !important;
+    border-color: rgba(75, 56, 60, 0.4) !important;
+}
+
+.dark .input-style {
+    background-color: #3D2E31 !important;
+    color: #FFF8E7 !important;
+    border: 1px solid #4B383C !important;
+}

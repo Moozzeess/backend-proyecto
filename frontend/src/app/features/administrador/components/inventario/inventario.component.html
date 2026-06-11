@@ -1,0 +1,41 @@
+<div class="space-y-8 animate-fadeIn">
+    <div>
+        <h2 class="text-4xl font-extrabold text-gray-800">Inventario de Ingredientes</h2>
+        <p class="text-gray-500 mt-1">Control de stock de materias primas clave en sucursales</p>
+    </div>
+
+    <!-- LISTADO INVENTARIO -->
+    <div class="card overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Materia Prima</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Stock Actual</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Stock Mínimo</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Estado</th>
+                    <th class="text-right p-6 text-sm font-bold text-gray-500">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let ing of listaIngredientes" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td class="p-6 font-bold text-gray-700">{{ ing.nombre }}</td>
+                    <td class="p-6 font-bold text-gray-600">{{ ing.stockActual }} {{ ing.unidad }}</td>
+                    <td class="p-6 text-gray-500">{{ ing.stockMinimo }} {{ ing.unidad }}</td>
+                    <td class="p-6">
+                        <span *ngIf="ing.stockActual > ing.stockMinimo" class="px-3 py-1 bg-green-50 text-green-600 font-bold rounded-full text-xs">
+                            Suficiente
+                        </span>
+                        <span *ngIf="ing.stockActual <= ing.stockMinimo" class="px-3 py-1 bg-red-50 text-red-600 font-bold rounded-full text-xs">
+                            Reabastecer Crítico
+                        </span>
+                    </td>
+                    <td class="p-6 text-right">
+                        <button (click)="reabastecerIngrediente(ing.id)" class="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-600 font-bold rounded-xl text-xs">
+                            Reabastecer 10
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

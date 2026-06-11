@@ -1,0 +1,154 @@
+<div class="flex min-h-screen bg-gray-50 font-sans">
+    <!-- SIDEBAR / MENÚ LATERAL -->
+    <aside class="sidebar w-72 text-white flex flex-col shadow-xl">
+        <div class="p-8 border-b border-white/10">
+            <h1 class="text-3xl font-black tracking-wider text-[#fdeba9]">
+                PIZZA PIZZA
+            </h1>
+            <p class="text-xs opacity-75 mt-1 tracking-widest uppercase">
+                Panel Administrativo
+            </p>
+        </div>
+
+        <nav class="flex-1 p-6 space-y-1 overflow-y-auto">
+            <button (click)="cambiarSeccion('dashboard')" 
+                    [class.active]="seccionActiva === 'dashboard'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/dashboard.svg" class="w-5 h-5 filter invert" alt="Dashboard">
+                Dashboard
+            </button>
+
+            <button (click)="cambiarSeccion('productos')" 
+                    [class.active]="seccionActiva === 'productos'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/productos.svg" class="w-5 h-5 filter invert" alt="Productos">
+                Productos
+            </button>
+
+            <button (click)="cambiarSeccion('inventario')" 
+                    [class.active]="seccionActiva === 'inventario'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/inventario.svg" class="w-5 h-5 filter invert" alt="Inventario">
+                Inventario
+            </button>
+
+            <button (click)="cambiarSeccion('pedidos')" 
+                    [class.active]="seccionActiva === 'pedidos'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/pedidos.svg" class="w-5 h-5 filter invert" alt="Pedidos">
+                Pedidos
+            </button>
+
+            <button (click)="cambiarSeccion('empleados')" 
+                    [class.active]="seccionActiva === 'empleados'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/empleados.svg" class="w-5 h-5 filter invert" alt="Empleados">
+                Empleados
+            </button>
+
+            <button (click)="cambiarSeccion('sucursales')" 
+                    [class.active]="seccionActiva === 'sucursales'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/sucursales.svg" class="w-5 h-5 filter invert" alt="Sucursales">
+                Sucursales
+            </button>
+
+            <button (click)="cambiarSeccion('reportes')" 
+                    [class.active]="seccionActiva === 'reportes'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/reportes.svg" class="w-5 h-5 filter invert" alt="Reportes">
+                Reportes
+            </button>
+
+            <button (click)="cambiarSeccion('facturacion')" 
+                    [class.active]="seccionActiva === 'facturacion'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/facturacion.svg" class="w-5 h-5 filter invert" alt="Facturacion">
+                Facturación
+            </button>
+
+            <button (click)="cambiarSeccion('configuracion')" 
+                    [class.active]="seccionActiva === 'configuracion'"
+                    class="menu-item w-full flex items-center gap-3 p-4 rounded-xl text-left font-medium hover:bg-white/10 transition-all">
+                <img src="/iconos/configuracion.svg" class="w-5 h-5 filter invert" alt="Configuracion">
+                Configuración
+            </button>
+        </nav>
+
+        <!-- PERFIL ADMINISTRADOR -->
+        <div class="p-6 border-t border-white/10 bg-black/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-[#fdeba9] text-[#d6254d] flex items-center justify-center font-bold text-lg shadow-inner">
+                    A
+                </div>
+                <div>
+                    <h4 class="font-semibold text-sm text-white">
+                        Admin General
+                    </h4>
+                    <p class="text-xs text-[#fdeba9] font-medium">
+                        {{ nombreRol }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 p-10 overflow-y-auto">
+        <!-- CONTENEDOR DE ALERTAS GLOBALES -->
+        <div class="space-y-4 mb-6">
+            <div *ngIf="mensajeExito" class="p-4 bg-green-50 border border-green-200 text-green-700 rounded-2xl flex items-center gap-3 animate-fadeIn shadow-sm">
+                <span class="font-semibold">{{ mensajeExito }}</span>
+            </div>
+
+            <div *ngIf="alertaActual" class="p-4 bg-red-50 border border-red-200 text-[#d6254d] rounded-2xl flex flex-col gap-1 animate-fadeIn shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="font-bold">{{ alertaActual.mensajeUsuario }}</span>
+                </div>
+                <span class="text-xs text-gray-400 font-mono ml-7">{{ alertaActual.descripcionTecnica }}</span>
+            </div>
+        </div>
+        
+        <!-- RENDERIZADO DINÁMICO DE SUBCOMPONENTES DESACOPLADOS -->
+        <app-admin-dashboard *ngIf="seccionActiva === 'dashboard'"
+                             [ventasHoyPesos]="ventasHoyPesos"
+                             [cantidadPedidos]="cantidadPedidos"></app-admin-dashboard>
+
+        <app-admin-productos *ngIf="seccionActiva === 'productos'"
+                             [listaProductos]="listaProductos"
+                             [ingredientesLlamativos]="ingredientesLlamativos"
+                             (guardar)="alGuardarProducto($event)"
+                             (eliminar)="alEliminarProducto($event)"
+                             (errorAlerta)="mostrarAlertaError($event)"
+                             (exitoAlerta)="mostrarAlertaExito($event)"></app-admin-productos>
+
+        <app-admin-inventario *ngIf="seccionActiva === 'inventario'"
+                              [listaIngredientes]="listaIngredientes"
+                              (reabastecer)="alReabastecerIngrediente($event)"></app-admin-inventario>
+
+        <app-admin-pedidos *ngIf="seccionActiva === 'pedidos'"
+                           (solicitarFactura)="alSolicitarFactura($event)"
+                           (exitoAlerta)="mostrarAlertaExito($event)"></app-admin-pedidos>
+
+        <app-admin-empleados *ngIf="seccionActiva === 'empleados'"
+                             [listaEmpleados]="listaEmpleados"
+                             (guardar)="alGuardarEmpleado($event)"
+                             (conmutarEstado)="alConmutarEstadoEmpleado($event)"
+                             (errorAlerta)="mostrarAlertaError($event)"
+                             (exitoAlerta)="mostrarAlertaExito($event)"></app-admin-empleados>
+
+        <app-admin-sucursales *ngIf="seccionActiva === 'sucursales'"
+                              [listaSucursales]="listaSucursales"></app-admin-sucursales>
+
+        <app-admin-reportes *ngIf="seccionActiva === 'reportes'"
+                            [listaProductos]="listaProductos"
+                            [listaSucursales]="listaSucursales"
+                            (exportar)="alExportarReporte($event)"></app-admin-reportes>
+
+        <app-facturacion-unificada *ngIf="seccionActiva === 'facturacion'"></app-facturacion-unificada>
+
+        <app-admin-configuracion *ngIf="seccionActiva === 'configuracion'"
+                                 [configuracionNegocio]="configuracionNegocio"
+                                 (guardar)="mostrarAlertaExito('Ajustes corporativos de configuración guardados.')"></app-admin-configuracion>
+    </main>
+</div>

@@ -1,0 +1,49 @@
+<div class="space-y-8 animate-fadeIn">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-4xl font-extrabold text-gray-800">Estadísticas y Reportes</h2>
+            <p class="text-gray-500 mt-1">Análisis de rendimiento financiero y volumétrico con filtros calculables</p>
+        </div>
+        <div class="flex gap-3">
+            <button (click)="exportarReporte('PDF')" class="px-4 py-2 bg-white border border-gray-200 text-gray-600 font-bold rounded-xl shadow hover:bg-gray-50">
+                Exportar PDF
+            </button>
+            <button (click)="exportarReporte('EXCEL')" class="px-4 py-2 bg-white border border-gray-200 text-gray-600 font-bold rounded-xl shadow hover:bg-gray-50">
+                Exportar Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTROLES DE PARÁMETROS CALCULABLES -->
+    <div class="card p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-2">Tipo de Reporte a Visualizar</label>
+            <select [(ngModel)]="tipoReporte" (change)="recalcularDatosReporte()"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+                <option value="ventas_semanales">Ventas Semanales</option>
+                <option value="productos_mas_vendidos">Pizzas / Catálogo más Vendido</option>
+                <option value="ventas_por_sucursal">Ventas Acumuladas por Sucursal</option>
+            </select>
+        </div>
+
+        <div *ngIf="tipoReporte === 'productos_mas_vendidos'">
+            <label class="block text-sm font-semibold text-gray-600 mb-2">Filtrar por Precio Mínimo ($)</label>
+            <input type="number" [(ngModel)]="filtroPrecioMinimo" (input)="recalcularDatosReporte()"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]" placeholder="Ej. 100">
+        </div>
+
+        <div class="flex gap-2">
+            <button (click)="recalcularDatosReporte()" class="w-full px-5 py-3 bg-[#d6254d] text-white font-bold rounded-xl shadow-lg hover:bg-[#ff5475]">
+                Recalcular Gráfica
+            </button>
+        </div>
+    </div>
+
+    <!-- GRÁFICA COMPARATIVA COMÚN -->
+    <div>
+        <app-grafica [titulo]="tituloGraficaCalculado" 
+                     [datos]="datosGraficaCalculados" 
+                     [unidad]="tipoReporte === 'productos_mas_vendidos' ? 'uds' : 'MXN'" 
+                     [esMoneda]="tipoReporte !== 'productos_mas_vendidos'"></app-grafica>
+    </div>
+</div>

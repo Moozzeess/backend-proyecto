@@ -1,0 +1,24 @@
+<div class="space-y-8 animate-fadeIn">
+    <div>
+        <h2 class="text-4xl font-extrabold text-gray-800">Sucursales Pizza Pizza</h2>
+        <p class="text-gray-500 mt-1">Ubicaciones corporativas y rendimiento de ventas</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div *ngFor="let suc of listaSucursales" class="card p-6 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800">{{ suc.nombre }}</h3>
+                    <span class="p-2 bg-green-50 text-green-600 rounded-full text-xs font-black">Activa</span>
+                </div>
+                <p class="text-sm text-gray-400 mt-3">{{ suc.direccion }}</p>
+                <p class="text-sm text-gray-600 mt-1 font-semibold">Teléfono: {{ suc.telefono }}</p>
+                <p class="text-sm text-gray-600 mt-1">Admin: {{ suc.administrador }}</p>
+            </div>
+            <div class="mt-6 border-t border-gray-100 pt-4">
+                <span class="text-xs text-gray-400 uppercase font-bold tracking-wider">Ventas Acumuladas</span>
+                <h4 class="text-3xl font-black text-[#d6254d] mt-1">${{ suc.ventasTotales | number }}</h4>
+            </div>
+        </div>
+    </div>
+</div>

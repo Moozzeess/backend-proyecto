@@ -1,0 +1,35 @@
+/*
+ * Archivo de Estilos: grafica.estilos.css
+ * Propósito: Define el diseño, colores y transiciones de las barras interactivas del componente de gráficas de barra común.
+ * Dónde se utiliza: En la plantilla de GraficaComponent (grafica.component.html).
+ */
+
+.grafica-contenedor {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.grafica-barra {
+    background: linear-gradient(185deg, #ff9036 0%, #d6254d 100%);
+    box-shadow: 0 4px 15px rgba(214, 37, 77, 0.2);
+    min-height: 4px;
+}
+
+.grafica-barra:hover {
+    background: linear-gradient(185deg, #ff5475 0%, #d6254d 100%);
+    box-shadow: 0 6px 20px rgba(214, 37, 77, 0.35);
+    transform: scaleX(1.03);
+}
+
+.grafica-barra-brillo {
+    background-color: white;
+}
+
+/* Reglas de Modo Oscuro para la Gráfica */
+.dark .grafica-contenedor {
+    background: #3D2E31 !important;
+    border: 1px solid #4B383C !important;
+    box-shadow: none !important;
+}
+

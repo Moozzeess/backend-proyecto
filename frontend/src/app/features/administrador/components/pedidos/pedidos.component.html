@@ -1,0 +1,56 @@
+<div class="space-y-8 animate-fadeIn">
+    <div>
+        <h2 class="text-4xl font-extrabold text-gray-800">Control de Pedidos</h2>
+        <p class="text-gray-500 mt-1">Estatus del horno, cocina y logística de envíos</p>
+    </div>
+
+    <!-- TABLA DE PEDIDOS -->
+    <div class="card overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">ID</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Cliente / Destino</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Productos</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Monto Total</th>
+                    <th class="text-left p-6 text-sm font-bold text-gray-500">Estado</th>
+                    <th class="text-right p-6 text-sm font-bold text-gray-500">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let ped of servicioPedidos.historialPedidos()" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td class="p-6 font-bold text-gray-800">{{ ped.id }}</td>
+                    <td class="p-6">
+                        <div class="font-bold text-gray-700">{{ ped.telefono }}</div>
+                        <div class="text-xs text-gray-400 mt-0.5">{{ ped.direccion || 'Recoge en Sucursal' }}</div>
+                    </td>
+                    <td class="p-6 text-xs text-gray-600">
+                        <div *ngFor="let item of ped.productos">
+                            {{ item.cantidad }}x {{ item.producto.nombre }}
+                        </div>
+                    </td>
+                    <td class="p-6 font-black text-gray-800">${{ ped.total }}</td>
+                    <td class="p-6">
+                        <select [ngModel]="ped.estado" (ngModelChange)="actualizarEstadoPedido(ped.id, $event)"
+                                class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold focus:outline-none">
+                            <option value="En preparación">En preparación</option>
+                            <option value="En el horno">En el horno</option>
+                            <option value="En camino">En camino</option>
+                            <option value="pagado">Entregado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </td>
+                    <td class="p-6 text-right">
+                        <button *ngIf="ped.estado === 'pagado'" (click)="facturar(ped)"
+                                class="px-3 py-1.5 bg-[#d6254d] text-white font-bold rounded-lg text-xs shadow hover:bg-[#ff5475]">
+                            Facturar
+                        </button>
+                        <span *ngIf="ped.estado !== 'pagado'" class="text-xs text-gray-400 font-medium">
+                            No disponible
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

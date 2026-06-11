@@ -1,0 +1,51 @@
+<div class="space-y-8 animate-fadeIn">
+    <div>
+        <h2 class="text-4xl font-extrabold text-gray-800">Ajustes Generales</h2>
+        <p class="text-gray-500 mt-1">Configuración del corporativo fiscal y moneda del negocio</p>
+    </div>
+
+    <div class="card p-8 max-w-2xl space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Razón Social Fiscal</label>
+                <input type="text" [(ngModel)]="configuracionNegocio.nombreEmpresa"
+                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Teléfono Corporativo</label>
+                <input type="text" [(ngModel)]="configuracionNegocio.telefonoContacto"
+                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Dirección Fiscal Corporativa</label>
+            <input type="text" [(ngModel)]="configuracionNegocio.direccionFiscal"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Moneda de Cobro</label>
+                <select [(ngModel)]="configuracionNegocio.monedaCobro"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+                    <option value="MXN ($)">Peso Mexicano (MXN)</option>
+                    <option value="USD ($)">Dólar Americano (USD)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Tasa de IVA (%)</label>
+                <input type="number" [(ngModel)]="configuracionNegocio.ivaPorcentaje"
+                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+            </div>
+        </div>
+
+        <div class="flex justify-end pt-4">
+            <button (click)="guardarConfiguracion()" class="px-6 py-3 bg-[#d6254d] text-white font-bold rounded-xl shadow-lg hover:bg-[#ff5475]">
+                Guardar Configuración
+            </button>
+        </div>
+    </div>
+</div>

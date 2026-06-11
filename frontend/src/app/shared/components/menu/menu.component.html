@@ -1,0 +1,126 @@
+<div class="contenedor-menu">
+  <!-- Cabecera Principal -->
+  <header class="cabecera-menu">
+    <h1>Menú Exclusivo Gourmet</h1>
+    <p>Disfruta de nuestras pizzas tradicionales, bebidas refrescantes y postres artesanales.</p>
+  </header>
+
+  <!-- Controles y Filtros de Categorías -->
+  <section class="controles-menu">
+    <div class="grupo-filtros">
+      <button 
+        class="boton-filtro" 
+        [class.activo]="categoriaSeleccionada() === 'todas'"
+        (click)="filtrarPorCategoria('todas')">
+        Todos los Productos
+      </button>
+      <button 
+        class="boton-filtro" 
+        [class.activo]="categoriaSeleccionada() === 'pizza'"
+        (click)="filtrarPorCategoria('pizza')">
+        Pizzas
+      </button>
+      <button 
+        class="boton-filtro" 
+        [class.activo]="categoriaSeleccionada() === 'bebida'"
+        (click)="filtrarPorCategoria('bebida')">
+        Bebidas
+      </button>
+      <button 
+        class="boton-filtro" 
+        [class.activo]="categoriaSeleccionada() === 'postre'"
+        (click)="filtrarPorCategoria('postre')">
+        Postres
+      </button>
+    </div>
+  </section>
+
+  <!-- Tabla de Menú Completo -->
+  <div class="tabla-contenedor">
+    <table class="tabla-menu" id="tabla-menu-productos">
+      <thead>
+        <tr>
+          <th scope="col" class="celda-imagen">Imagen</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Ingredientes</th>
+          <th scope="col">Categoría</th>
+          <th scope="col">Tamaño</th>
+          <th scope="col">Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productosPaginados()">
+          <td class="celda-imagen">
+            <img 
+              [src]="producto.imagenUrl" 
+              [alt]="producto.nombre" 
+              class="imagen-producto"
+              loading="lazy" />
+          </td>
+          <td>
+            <span class="nombre-producto">{{ producto.nombre }}</span>
+          </td>
+          <td>
+            <p class="ingredientes-lista">{{ producto.ingredientes }}</p>
+          </td>
+          <td>
+            <span class="etiqueta-categoria" [ngClass]="{
+              'cat-pizza': producto.categoria === 'pizza',
+              'cat-bebida': producto.categoria === 'bebida',
+              'cat-postre': producto.categoria === 'postre'
+            }">
+              {{ producto.categoria }}
+            </span>
+          </td>
+          <td>
+            <span class="etiqueta-tamano">{{ producto.tamano }}</span>
+          </td>
+          <td>
+            <span class="precio-valor">${{ producto.precio }}.00</span>
+          </td>
+        </tr>
+        <tr *ngIf="productosPaginados().length === 0">
+          <td colspan="6" style="text-align: center; padding: 2rem;">
+            No se encontraron productos en esta categoría.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación de Resultados -->
+  <footer class="paginacion-contenedor">
+    <div class="paginacion-info">
+      Mostrando página {{ paginaActual() }} de {{ totalPaginas() }} ({{ productosFiltrados().length }} productos en total)
+    </div>
+    
+    <div class="paginacion-botones" *ngIf="totalPaginas() > 1">
+      <!-- Botón Anterior -->
+      <button 
+        class="boton-paginacion" 
+        (click)="cambiarPagina(paginaActual() - 1)" 
+        [disabled]="paginaActual() === 1"
+        aria-label="Página anterior">
+        &laquo;
+      </button>
+
+      <!-- Números de Página -->
+      <button 
+        *ngFor="let pagina of obtenerListaPaginas()" 
+        class="boton-paginacion" 
+        [class.activo]="paginaActual() === pagina"
+        (click)="cambiarPagina(pagina)">
+        {{ pagina }}
+      </button>
+
+      <!-- Botón Siguiente -->
+      <button 
+        class="boton-paginacion" 
+        (click)="cambiarPagina(paginaActual() + 1)" 
+        [disabled]="paginaActual() === totalPaginas()"
+        aria-label="Página siguiente">
+        &raquo;
+      </button>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,34 @@
+<div class="grafica-contenedor p-6 rounded-2xl bg-white shadow-md">
+    <h3 class="text-xl font-bold text-gray-800 mb-6">
+        {{ titulo }}
+    </h3>
+
+    <div *ngIf="datos && datos.length > 0; else sinDatos" class="flex items-end justify-around h-64 gap-2 pt-6">
+        <div *ngFor="let item of datos" class="flex flex-col items-center flex-1 h-full justify-end group">
+            <!-- Etiqueta del valor arriba de la barra en hover -->
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 mb-2 absolute translate-y-[-45px] pointer-events-none z-10">
+                <span *ngIf="esMoneda">$</span>{{ item.valor | number:'1.0-2' }} {{ unidad }}
+            </div>
+
+            <!-- Barra con altura proporcional -->
+            <div class="grafica-barra w-full rounded-t-lg transition-all duration-500 ease-out cursor-pointer relative"
+                 [style.height]="obtenerAlturaPorcentual(item.valor)">
+                 <div class="grafica-barra-brillo absolute inset-0 opacity-0 group-hover:opacity-20 bg-white transition-opacity rounded-t-lg"></div>
+            </div>
+
+            <!-- Etiqueta en el eje X -->
+            <span class="text-xs text-gray-500 mt-2 truncate w-full text-center" [title]="item.etiqueta">
+                {{ item.etiqueta }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Estado vacío si no hay datos -->
+    <ng-template #sinDatos>
+        <div class="flex flex-col items-center justify-center h-64 border border-dashed border-gray-200 rounded-xl">
+            <p class="text-gray-400">
+                No hay información disponible para graficar.
+            </p>
+        </div>
+    </ng-template>
+</div>

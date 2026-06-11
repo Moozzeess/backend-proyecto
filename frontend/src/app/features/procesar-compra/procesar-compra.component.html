@@ -1,0 +1,276 @@
+<div class="checkout-wrapper">
+    <div class="max-w-7xl mx-auto">
+        <!-- CONTENEDOR PRINCIPAL DE DOS COLUMNAS -->
+        <div class="checkout-card grid lg:grid-cols-3">
+            
+            <!-- COLUMNA IZQUIERDA Y CENTRAL: FORMULARIO DE CHECKOUT (2 COLUMNAS) -->
+            <div class="lg:col-span-2 p-8 lg:p-12">
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Completar tu Pedido</h1>
+                <p class="text-gray-500 mb-8">Por favor, rellena los datos a continuación para finalizar tu compra.</p>
+
+                <form (ngSubmit)="procesarOrden()" class="space-y-8">
+                    <!-- SECCIÓN 1: DATOS DE CONTACTO -->
+                    <div class="seccion-tarjeta">
+                        <h2 class="seccion-titulo flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#d6254d]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            Datos de Contacto
+                        </h2>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Nombre completo</label>
+                                <input type="text" name="nombreCliente" [ngModel]="nombreCliente()"
+                                    (ngModelChange)="nombreCliente.set($event)" required placeholder="Tu nombre"
+                                    class="input-campo" id="input-checkout-nombre">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Teléfono de contacto</label>
+                                <input type="tel" name="telefonoCliente" [ngModel]="telefonoCliente()"
+                                    (ngModelChange)="telefonoCliente.set($event)" required placeholder="ej. 5512345678"
+                                    class="input-campo" id="input-checkout-telefono">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 2: MÉTODO DE ENTREGA -->
+                    <div class="seccion-tarjeta">
+                        <h2 class="seccion-titulo flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#d6254d]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 8h7a1 1 0 011 1v7m-8-8v8" /></svg>
+                            Método de Entrega
+                        </h2>
+                        
+                        <div class="selector-grupo mb-5">
+                            <!-- Opción Domicilio -->
+                            <div class="selector-opcion" 
+                                 [class.seleccionada]="metodoEntrega() === 'domicilio'"
+                                 (click)="cambiarMetodoEntrega('domicilio')"
+                                 id="btn-entrega-domicilio">
+                                <span class="selector-titulo">Entrega a domicilio</span>
+                                <span class="selector-descripcion">Directo a tu casa u oficina (+$45.00)</span>
+                            </div>
+                            <!-- Opción Sucursal -->
+                            <div class="selector-opcion" 
+                                 [class.seleccionada]="metodoEntrega() === 'sucursal'"
+                                 (click)="cambiarMetodoEntrega('sucursal')"
+                                 id="btn-entrega-sucursal">
+                                <span class="selector-titulo">Recoger en sucursal</span>
+                                <span class="selector-descripcion">Retira tu pedido caliente sin costo extra</span>
+                            </div>
+                        </div>
+
+                        <!-- Campos dinámicos de dirección si es Domicilio -->
+                        <div *ngIf="metodoEntrega() === 'domicilio'" class="grid sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                            <div class="sm:col-span-2">
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Calle</label>
+                                <input type="text" name="calle" [ngModel]="calle()"
+                                    (ngModelChange)="calle.set($event)" placeholder="ej. Av. Reforma"
+                                    class="input-campo" id="input-checkout-calle">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Núm. Exterior</label>
+                                <input type="text" name="numeroExterior" [ngModel]="numeroExterior()"
+                                    (ngModelChange)="numeroExterior.set($event)" placeholder="ej. 123"
+                                    class="input-campo" id="input-checkout-numero">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Código Postal</label>
+                                <input type="text" name="codigoPostal" [ngModel]="codigoPostal()"
+                                    (ngModelChange)="codigoPostal.set($event)" placeholder="ej. 06000"
+                                    class="input-campo" id="input-checkout-cp">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Referencias de entrega (Opcional)</label>
+                                <input type="text" name="referencia" [ngModel]="referencia()"
+                                    (ngModelChange)="referencia.set($event)" placeholder="ej. Portón azul frente al parque"
+                                    class="input-campo" id="input-checkout-referencia">
+                            </div>
+                        </div>
+
+                        <!-- Información si es recoger en sucursal -->
+                        <div *ngIf="metodoEntrega() === 'sucursal'" class="p-4 bg-[#fdeba9]/30 rounded-xl border border-[#f6d76b]/30 text-gray-700 text-sm mt-2 flex items-start gap-2">
+                            <svg class="w-4 h-4 text-[#d6254d] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <div>
+                                <strong>Sucursal Principal:</strong> Av. Universidad 1020, Colonia del Valle, Ciudad de México.
+                                <br>Tu pedido estará listo en aproximadamente 15 minutos tras confirmar la orden.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 3: MÉTODO DE PAGO -->
+                    <div class="seccion-tarjeta">
+                        <h2 class="seccion-titulo flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#d6254d]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18" /></svg>
+                            Método de Pago
+                        </h2>
+
+                        <div class="selector-grupo mb-5">
+                            <!-- Opción Tarjeta -->
+                            <div class="selector-opcion"
+                                 [class.seleccionada]="metodoPago() === 'tarjeta'"
+                                 (click)="cambiarMetodoPago('tarjeta')"
+                                 id="btn-pago-tarjeta">
+                                <span class="selector-titulo">Tarjeta de Crédito / Débito</span>
+                                <span class="selector-descripcion">Pago en línea seguro e inmediato</span>
+                            </div>
+                            <!-- Opción Efectivo -->
+                            <div class="selector-opcion"
+                                 [class.seleccionada]="metodoPago() === 'efectivo'"
+                                 (click)="cambiarMetodoPago('efectivo')"
+                                 id="btn-pago-efectivo">
+                                <span class="selector-titulo">Efectivo al Recibir</span>
+                                <span class="selector-descripcion">Paga al repartidor o en caja al recoger</span>
+                            </div>
+                        </div>
+
+                        <!-- Campos dinámicos de Tarjeta -->
+                        <div *ngIf="metodoPago() === 'tarjeta'" class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                            <div class="sm:col-span-2">
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Nombre del titular</label>
+                                <input type="text" name="nombreTarjeta" [ngModel]="nombreTarjeta()"
+                                    (ngModelChange)="nombreTarjeta.set($event)" placeholder="Como aparece en la tarjeta"
+                                    class="input-campo" id="input-checkout-titular">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Número de tarjeta</label>
+                                <input type="text" name="numeroTarjeta" [ngModel]="numeroTarjeta()"
+                                    (ngModelChange)="numeroTarjeta.set($event)" placeholder="16 dígitos sin espacios"
+                                    class="input-campo" maxlength="16" id="input-checkout-numerotarjeta">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block mb-2 text-sm font-semibold text-gray-600">Vence (MM/AA)</label>
+                                    <input type="text" name="fechaExpiracion" [ngModel]="fechaExpiracion()"
+                                        (ngModelChange)="fechaExpiracion.set($event)" placeholder="12/28"
+                                        class="input-campo" maxlength="5" id="input-checkout-vencimiento">
+                                </div>
+                                <div>
+                                    <label class="block mb-2 text-sm font-semibold text-gray-600">CVV</label>
+                                    <input type="password" name="codigoVerificacion" [ngModel]="codigoVerificacion()"
+                                        (ngModelChange)="codigoVerificacion.set($event)" placeholder="123"
+                                        class="input-campo" maxlength="3" id="input-checkout-cvv">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN 4: FACTURACIÓN (OPCIONAL) -->
+                    <div class="seccion-tarjeta">
+                        <h2 class="seccion-titulo">
+                            Obtener Factura Fiscal
+                        </h2>
+
+                        <div class="selector-grupo mb-5">
+                            <div class="selector-opcion"
+                                 [class.seleccionada]="solicitarFactura()"
+                                 (click)="solicitarFactura.set(!solicitarFactura())"
+                                 id="btn-solicitar-factura">
+                                <span class="selector-titulo">Solicitar Factura Electrónica (CFDI)</span>
+                                <span class="selector-descripcion">Si requiere comprobante fiscal deducible de impuestos</span>
+                            </div>
+                        </div>
+
+                        <div *ngIf="solicitarFactura()" class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">RFC</label>
+                                <input type="text" name="rfcFactura" [ngModel]="rfcFactura()"
+                                       (ngModelChange)="rfcFactura.set($event)" placeholder="ej. XAXX010101000"
+                                       class="input-campo" id="input-checkout-rfc">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Razón Social</label>
+                                <input type="text" name="razonSocialFactura" [ngModel]="razonSocialFactura()"
+                                       (ngModelChange)="razonSocialFactura.set($event)" placeholder="Nombre o Razón Social"
+                                       class="input-campo" id="input-checkout-razonsocial">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Código Postal Fiscal</label>
+                                <input type="text" name="codigoPostalFactura" [ngModel]="codigoPostalFactura()"
+                                       (ngModelChange)="codigoPostalFactura.set($event)" placeholder="ej. 01000"
+                                       class="input-campo" id="input-checkout-cpfiscal">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-semibold text-gray-600">Uso de CFDI</label>
+                                <select name="usoCfdiFactura" [ngModel]="usoCfdiFactura()"
+                                        (ngModelChange)="usoCfdiFactura.set($event)"
+                                        class="input-campo" id="select-checkout-usocfdi">
+                                    <option value="G03 - Gastos en general">G03 - Gastos en general</option>
+                                    <option value="D01 - Honorarios médicos">D01 - Honorarios médicos</option>
+                                    <option value="P01 - Por definir">P01 - Por definir</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTONERA DE ACCIÓN Y ALERTAS -->
+                    <div class="space-y-4">
+                        <!-- Alerta de Error Centralizada (Regla 8) -->
+                        <div *ngIf="alertaActual()" class="alerta-error-checkout space-y-2">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-[#d6254d] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <div>
+                                    <p class="font-bold">Error: {{ alertaActual()?.mensajeUsuario }}</p>
+                                    <p class="text-xs opacity-90 mt-1">
+                                        <strong>Detalle técnico (Dev):</strong> {{ alertaActual()?.descripcionTecnica }}
+                                    </p>
+                                    <p class="text-xs opacity-80">
+                                        <strong>Acción recomendada:</strong> {{ alertaActual()?.explicacionDesarrollador }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alerta de Éxito -->
+                        <div *ngIf="mensajeExito()" class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-xl text-sm font-medium flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            {{ mensajeExito() }}
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <a routerLink="/cliente" class="btn-cancelar" id="btn-checkout-cancelar">
+                                Volver al Panel
+                            </a>
+                            <button type="submit" class="btn-pagar" id="btn-checkout-confirmar" [disabled]="elementosCarrito().length === 0">
+                                Confirmar y Pagar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- COLUMNA DERECHA: RESUMEN DE LA COMPRA (1 COLUMNA) -->
+            <div class="resumen-contenedor flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-extrabold text-gray-800 mb-6 pb-4 border-b border-gray-200">Resumen de Compra</h3>
+                    
+                    <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                        <div *ngFor="let item of elementosCarrito()" class="item-resumen">
+                            <div>
+                                <p class="item-nombre">{{ item.producto.nombre }}</p>
+                                <p class="item-cantidad">Cantidad: {{ item.cantidad }}</p>
+                            </div>
+                            <p class="item-precio">${{ item.producto.precio * item.cantidad }}.00</p>
+                        </div>
+                        <div *ngIf="elementosCarrito().length === 0" class="text-center py-8 text-gray-400 text-sm">
+                            No hay productos en el carrito.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-gray-200 mt-6 space-y-3">
+                    <div class="flex justify-between text-gray-600 text-sm">
+                        <span>Subtotal</span>
+                        <span>${{ totalPagar() }}.00</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600 text-sm">
+                        <span>Costo de envío</span>
+                        <span>{{ costoEnvio() > 0 ? '$' + costoEnvio() + '.00' : 'Gratis' }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-900 font-extrabold text-lg pt-3 border-t border-dashed border-gray-200">
+                        <span>Total a pagar</span>
+                        <span class="text-[#d6254d]">${{ totalFinal() }}.00</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

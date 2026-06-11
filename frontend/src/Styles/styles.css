@@ -1,0 +1,137 @@
+/**
+ * Estilos globales de la aplicación
+ * Propósito: Punto de entrada para los estilos globales y directivas de TailwindCSS
+ * Dónde se utiliza: Configurado en angular.json como archivo de estilos principal para toda la aplicación
+ */
+
+@import 'tailwindcss';
+
+@source '../app/**/*.html';
+@source '../app/**/*.ts';
+
+@import './landing-page.estilos.css';
+@import './login.estilos.css';
+@import './cliente.estilos.css';
+@import './empleado.estilos.css';
+@import './administrador.estilos.css';
+@import './menu.estilos.css';
+@import './procesar-compra.estilos.css';
+@import './grafica.estilos.css';
+@import './correo.estilos.css';
+
+
+/**
+ * Variables del Sistema de Diseño y Modos de Visualización
+ * Propósito: Proveer colores consistentes para el modo claro y el modo oscuro.
+ */
+:root {
+  --color-fondo-principal: #f9fafb;
+  --color-fondo-secundario: #ffffff;
+  --color-sidebar-bg: linear-gradient(180deg, #d6254d 0%, #a61d3d 100%);
+  --color-cards-bg: #ffffff;
+  --color-bordes: #e5e7eb;
+  --color-texto-principal: #1f2937;
+  --color-texto-secundario: #4b5563;
+}
+
+/**
+ * Reglas de sobreescritura para Modo Oscuro
+ * Propósito: Aplicar la paleta de colores oscuros requerida por el usuario a todas las vistas.
+ */
+.dark {
+  --color-fondo-principal: #221B1C;
+  --color-fondo-secundario: #2D2426;
+  --color-sidebar-bg: #34282A;
+  --color-cards-bg: #3D2E31;
+  --color-bordes: #4B383C;
+  --color-texto-principal: #FFF8E7;
+  --color-texto-secundario: #D9CFC0;
+
+  background-color: #221B1C !important;
+  color: #FFF8E7 !important;
+}
+
+/* Sobreescrituras específicas de clases de Tailwind CSS en Modo Oscuro */
+.dark body {
+  background-color: #221B1C !important;
+  color: #FFF8E7 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #221B1C !important;
+}
+
+.dark .bg-white {
+  background-color: #2D2426 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #2D2426 !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: #4B383C !important;
+}
+
+.dark .border-gray-50,
+.dark .border-gray-100,
+.dark .border-gray-200 {
+  border-color: #4B383C !important;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-900,
+.dark .text-gray-750 {
+  color: #FFF8E7 !important;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #D9CFC0 !important;
+}
+
+/* Estilos de elementos de formulario generales en Modo Oscuro */
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="password"],
+.dark input[type="email"],
+.dark input[type="tel"],
+.dark select,
+.dark textarea {
+  background-color: #3D2E31 !important;
+  color: #FFF8E7 !important;
+  border-color: #4B383C !important;
+}
+
+.dark input::placeholder {
+  color: #D9CFC0 !important;
+  opacity: 0.7;
+}
+
+/* Asegurar legibilidad del texto en fondos de color claro (amarillos, crema, naranja) en Modo Oscuro */
+.dark .bg-\[\#fdeba9\],
+.dark .bg-\[\#f6d76b\],
+.dark .bg-\[\#ff9036\],
+.dark .bg-yellow-50,
+.dark .bg-amber-150,
+.dark .bg-amber-100,
+.dark .bg-amber-200,
+.dark .status-new {
+  color: #221B1C !important;
+}
+
+.dark .bg-\[\#fdeba9\] *,
+.dark .bg-\[\#f6d76b\] *,
+.dark .bg-\[\#ff9036\] *,
+.dark .bg-yellow-50 *,
+.dark .bg-amber-150 *,
+.dark .bg-amber-100 *,
+.dark .bg-amber-200 *,
+.dark .status-new * {
+  color: #221B1C !important;
+}
+
+
+

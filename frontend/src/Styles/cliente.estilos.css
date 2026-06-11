@@ -1,0 +1,252 @@
+/*
+ * Archivo de Estilos: cliente.estilos.css
+ * Propósito: Define los estilos específicos para el panel de cliente, incluyendo gradientes personalizados,
+ *            animaciones de hover para tarjetas de productos, efectos de glassmorphism y el modal del carrito.
+ * Dónde se utiliza: En la plantilla del componente cliente (cliente.component.html).
+ */
+
+.gradient-main {
+    background: linear-gradient(
+        135deg,
+        #ff9036,
+        #d6254d
+    );
+}
+
+.card-hover {
+    transition: transform 0.35s ease-in-out;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px);
+}
+
+.product-card {
+    transition: transform 0.4s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+}
+
+.product-card img {
+    transition: transform 0.5s ease-in-out;
+}
+
+.product-card:hover img {
+    transform: scale(1.08);
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Modal del Carrito */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(45, 52, 54, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.modal-contenido {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: aparecer 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-cabecera {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(214, 37, 77, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-cuerpo {
+    padding: 2rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-pie {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(214, 37, 77, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(253, 235, 169, 0.1);
+}
+
+/* Item del Carrito */
+.item-carrito-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.item-carrito-fila:last-child {
+    border-bottom: none;
+}
+
+.item-carrito-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.item-carrito-imagen {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.item-carrito-detalles h4 {
+    margin: 0;
+    font-weight: 700;
+    color: #2d3436;
+}
+
+.item-carrito-detalles p {
+    margin: 0.2rem 0 0;
+    color: #d6254d;
+    font-weight: 600;
+}
+
+.item-carrito-controles {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn-cantidad {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(214, 37, 77, 0.3);
+    background-color: #ffffff;
+    color: #d6254d;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-cantidad:hover {
+    background-color: #d6254d;
+    color: #ffffff;
+}
+
+/* Efectos de input de búsqueda */
+.buscador-input-contenedor {
+    transition: box-shadow 0.3s ease;
+}
+.buscador-input-contenedor:focus-within {
+    box-shadow: 0 0 0 3px rgba(214, 37, 77, 0.2);
+}
+
+/* Historial de Pedidos */
+.pedido-historial-fila {
+    border: 1.5px solid rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+    transition: all 0.25s ease;
+}
+
+.pedido-historial-fila:hover {
+    border-color: rgba(255, 144, 54, 0.3);
+    background-color: rgba(253, 235, 169, 0.1);
+    box-shadow: 0 4px 12px rgba(255, 144, 54, 0.05);
+}
+
+.seccion-detalles-pedido {
+    background-color: #f9f9f9;
+    border: 1px dashed rgba(214, 37, 77, 0.15);
+}
+
+/* Reglas de Modo Oscuro para la Vista de Clientes */
+.dark .glass {
+    background: rgba(45, 36, 38, 0.8) !important;
+    border-color: rgba(75, 56, 60, 0.4) !important;
+}
+
+.dark .modal-contenido {
+    background-color: #2D2426 !important;
+    color: #FFF8E7 !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .modal-cabecera {
+    border-bottom-color: rgba(75, 56, 60, 0.4) !important;
+}
+
+.dark .modal-pie {
+    border-top-color: rgba(75, 56, 60, 0.4) !important;
+    background-color: rgba(61, 46, 49, 0.4) !important;
+}
+
+.dark .item-carrito-fila {
+    border-bottom-color: rgba(75, 56, 60, 0.3) !important;
+}
+
+.dark .item-carrito-detalles h4 {
+    color: #FFF8E7 !important;
+}
+
+.dark .btn-cantidad {
+    background-color: #3D2E31 !important;
+    border-color: rgba(214, 37, 77, 0.4) !important;
+    color: #FFF8E7 !important;
+}
+
+.dark .btn-cantidad:hover {
+    background-color: #d6254d !important;
+    color: #ffffff !important;
+}
+
+.dark .pedido-historial-fila {
+    background-color: #2D2426 !important;
+    border-color: #4B383C !important;
+}
+
+.dark .pedido-historial-fila:hover {
+    background-color: rgba(61, 46, 49, 0.4) !important;
+    border-color: rgba(255, 144, 54, 0.5) !important;
+}
+
+.dark .seccion-detalles-pedido {
+    background-color: #3D2E31 !important;
+    border-color: rgba(214, 37, 77, 0.3) !important;
+}
+
+

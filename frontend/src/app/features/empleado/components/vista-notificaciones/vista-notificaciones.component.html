@@ -1,0 +1,55 @@
+<div class="mt-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h3 class="text-2xl font-bold text-gray-800">
+                Centro de Notificaciones
+            </h3>
+            <p class="text-gray-500 text-sm mt-1">
+                Registro de incidencias de stock, nuevos pedidos y alertas operativas
+            </p>
+        </div>
+        <button *ngIf="notificaciones.length > 0" 
+                (click)="limpiar()" 
+                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-bold rounded-xl transition-colors cursor-pointer">
+            Limpiar Todo
+        </button>
+    </div>
+
+    <div *ngIf="notificaciones.length === 0" class="card p-12 text-center text-gray-500">
+        <p class="text-lg font-medium">Bandeja de entrada vacía</p>
+        <p class="text-sm text-gray-400 mt-2">No hay alertas ni notificaciones pendientes en este momento.</p>
+    </div>
+
+    <div class="space-y-4">
+        <div *ngFor="let nota of notificaciones" 
+             class="card p-5 border-l-4 flex justify-between items-start transition-all"
+             [ngClass]="{
+                 'border-red-500 bg-red-50/20': nota.tipo === 'alerta',
+                 'border-green-500 bg-green-50/20': nota.tipo === 'exito',
+                 'border-blue-500 bg-blue-50/20': nota.tipo === 'informacion'
+             }">
+            <div class="flex-1 mr-4">
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="text-xs font-bold uppercase tracking-wider"
+                          [ngClass]="{
+                              'text-red-600': nota.tipo === 'alerta',
+                              'text-green-600': nota.tipo === 'exito',
+                              'text-blue-600': nota.tipo === 'informacion'
+                          }">
+                        {{ nota.tipo === 'alerta' ? 'Alerta Crítica' : nota.tipo === 'exito' ? 'Operación Exitosa' : 'Aviso General' }}
+                    </span>
+                    <span class="text-xs text-gray-400">
+                        {{ nota.fechaHora }}
+                    </span>
+                </div>
+                <p class="text-gray-700 font-semibold text-sm">
+                    {{ nota.mensaje }}
+                </p>
+            </div>
+            <button (click)="descartar(nota.id)" 
+                    class="text-gray-400 hover:text-gray-600 text-xs font-bold px-2 py-1 rounded bg-gray-50 border border-gray-100 cursor-pointer">
+                Descartar
+            </button>
+        </div>
+    </div>
+</div>

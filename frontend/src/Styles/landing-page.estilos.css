@@ -1,0 +1,163 @@
+/**
+ * Estilos globales para la página de aterrizaje (Landing Page)
+ * Propósito: Define estilos reutilizables para el componente LandingPage
+ * Ubicación: Se utiliza en el componente LandingPage
+ */
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #fffdf7;
+    overflow-x: hidden;
+}
+
+/**
+ * Fondo con gradiente para secciones destacadas
+ */
+.gradient-bg {
+    background: linear-gradient(
+        135deg,
+        #f6d76b,
+        #ff9036,
+        #d6254d
+    );
+}
+
+/**
+ * Efecto de brillo en la sección hero
+ */
+.hero-glow {
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, #ff903680, transparent);
+    filter: blur(100px);
+    top: -250px;
+    right: -250px;
+}
+
+/**
+ * Segundo efecto de brillo en la sección hero
+ */
+.hero-glow-2 {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #d6254d60, transparent);
+    filter: blur(120px);
+    bottom: -250px;
+    left: -250px;
+}
+
+/**
+ * Efecto de cristal esmerilado para elementos
+ */
+.glass {
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, .25);
+    border: 1px solid rgba(255, 255, 255, .3);
+}
+
+/**
+ * Animación de flotación para la imagen de pizza
+ */
+.pizza-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(3deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+}
+
+/**
+ * Tarjeta de menú con efecto hover
+ */
+.menu-card {
+    transition: .4s;
+}
+
+.menu-card:hover {
+    transform: translateY(-10px);
+}
+
+.menu-card img {
+    transition: .5s;
+}
+
+.menu-card:hover img {
+    transform: scale(1.1);
+}
+
+/**
+ * Texto con gradiente
+ */
+.text-gradient {
+    background: linear-gradient(
+        90deg,
+        #d6254d,
+        #ff9036
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/**
+ * Botón primario con gradiente
+ */
+.btn-primary {
+    background: linear-gradient(
+        135deg,
+        #d6254d,
+        #ff5475
+    );
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+}
+
+/**
+ * Forma orgánica decorativa
+ */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: .3;
+}
+
+/* Reglas de Modo Oscuro para la Landing Page */
+.dark body {
+    background: #221B1C !important;
+    color: #FFF8E7 !important;
+}
+
+.dark .menu-card {
+    background-color: #3D2E31 !important;
+    border-color: #4B383C !important;
+}
+
+.dark .glass {
+    background: rgba(45, 36, 38, 0.45) !important;
+    border-color: rgba(75, 56, 60, 0.3) !important;
+}
+
+.dark .hero-glow {
+    background: radial-gradient(circle, rgba(255, 144, 54, 0.2), transparent) !important;
+}
+
+.dark .hero-glow-2 {
+    background: radial-gradient(circle, rgba(214, 37, 77, 0.15), transparent) !important;
+}
+

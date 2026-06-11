@@ -1,0 +1,73 @@
+<div class="correo-wrapper">
+    <div class="correo-contenedor">
+        <!-- HERO -->
+        <div class="correo-hero">
+            <h1 class="correo-logo">
+                Pizza Pizza
+            </h1>
+            <div class="correo-subtitulo">
+                Sistema Inteligente de Gestión
+            </div>
+        </div>
+
+        <!-- CONTENIDO -->
+        <div class="correo-contenido">
+            <span *ngIf="categoria" class="correo-badge">
+                {{ categoria }}
+            </span>
+
+            <div *ngIf="titulo" class="correo-titulo">
+                {{ titulo }}
+            </div>
+
+            <div *ngIf="mensaje" class="correo-mensaje">
+                {{ mensaje }}
+            </div>
+
+            <!-- TARJETA DE INFORMACIÓN -->
+            <div *ngIf="tituloTarjeta || referencia || fecha || estado" class="correo-tarjeta">
+                <div *ngIf="tituloTarjeta" class="correo-tarjeta-titulo">
+                    {{ tituloTarjeta }}
+                </div>
+
+                <div *ngIf="referencia" class="correo-fila-info">
+                    <span class="correo-etiqueta">Referencia</span>
+                    <span class="correo-valor">{{ referencia }}</span>
+                </div>
+
+                <div *ngIf="fecha" class="correo-fila-info">
+                    <span class="correo-etiqueta">Fecha</span>
+                    <span class="correo-valor">{{ fecha }}</span>
+                </div>
+
+                <div *ngIf="estado" class="correo-fila-info">
+                    <span class="correo-etiqueta">Estado</span>
+                    <span class="correo-valor">{{ estado }}</span>
+                </div>
+            </div>
+
+            <!-- ACCIÓN PRINCIPAL (CTA) -->
+            <div *ngIf="urlAccion && textoAccion" class="correo-contenedor-boton">
+                <a [href]="urlAccion" class="correo-boton">
+                    {{ textoAccion }}
+                </a>
+            </div>
+
+            <div *ngIf="mensajeAdicional" class="correo-mensaje-adicional">
+                {{ mensajeAdicional }}
+            </div>
+        </div>
+
+        <!-- PIE DE CORREO -->
+        <div class="correo-pie">
+            <div class="correo-pie-logo">
+                Pizza Pizza
+            </div>
+            <div class="correo-pie-texto">
+                Este mensaje fue generado automáticamente por el sistema.
+                <br>
+                Por favor no responda directamente a este correo.
+            </div>
+        </div>
+    </div>
+</div>

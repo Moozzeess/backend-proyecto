@@ -1,0 +1,60 @@
+/*
+ * Archivo de Estilos: empleado.estilos.css
+ * Propósito: Define los estilos visuales para el panel del empleado, incluyendo la barra lateral,
+ *            las tarjetas de pedidos tipo kanban y los estados de preparación de los pedidos.
+ * Dónde se utiliza: En la plantilla del componente empleado (empleado.component.html).
+ */
+
+.sidebar {
+    background: linear-gradient(
+        180deg,
+        #d6254d,
+        #b11e40
+    );
+}
+
+.card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.order-card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.order-card:hover {
+    transform: translateY(-4px);
+}
+
+.status-new {
+    background: #fdeba9;
+    color: #c57c00;
+}
+
+.status-preparing {
+    background: #ffe0cc;
+    color: #ff9036;
+}
+
+.status-ready {
+    background: #d7ffe8;
+    color: #16a34a;
+}
+
+.status-delivered {
+    background: #e5e7eb;
+    color: #64748b;
+}
+
+/* Reglas de Modo Oscuro para la Vista de Empleado */
+.dark .sidebar {
+    background: #34282A !important;
+}
+
+.dark .card {
+    background: #3D2E31 !important;
+    border-color: #4B383C !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+

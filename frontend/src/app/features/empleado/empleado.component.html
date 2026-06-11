@@ -1,0 +1,141 @@
+<div class="flex min-h-screen bg-gray-50/50">
+    <!-- SIDEBAR -->
+    <aside class="sidebar w-72 text-white p-8 flex flex-col justify-between">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight">
+                Pizza Pizza
+            </h1>
+            <p class="opacity-75 mt-1 text-sm font-semibold uppercase tracking-wider text-[#fdeba9]">
+                Modulo Operativo
+            </p>
+
+            <nav class="mt-12 space-y-3">
+                <a (click)="cambiarSeccion('pedidos')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'pedidos', 'hover:bg-white/10': seccionActiva !== 'pedidos'}">
+                    Pedidos Kanban
+                </a>
+
+                <a (click)="cambiarSeccion('cocina')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'cocina', 'hover:bg-white/10': seccionActiva !== 'cocina'}">
+                    Cocina y Armado
+                </a>
+
+                <a (click)="cambiarSeccion('entregas')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'entregas', 'hover:bg-white/10': seccionActiva !== 'entregas'}">
+                    Despacho Envíos
+                </a>
+
+                <a (click)="cambiarSeccion('inventario')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'inventario', 'hover:bg-white/10': seccionActiva !== 'inventario'}">
+                    Almacén Insumos
+                </a>
+
+                <a (click)="cambiarSeccion('notificaciones')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all relative"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'notificaciones', 'hover:bg-white/10': seccionActiva !== 'notificaciones'}">
+                    <span>Centro Alertas</span>
+                    <span *ngIf="listaNotificaciones.length > 0" class="absolute right-4 top-1/2 -translate-y-1/2 bg-[#ff9036] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        {{ listaNotificaciones.length }}
+                    </span>
+                </a>
+
+                <a (click)="cambiarSeccion('corte')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'corte', 'hover:bg-white/10': seccionActiva !== 'corte'}">
+                    Corte de Caja
+                </a>
+
+                <a (click)="cambiarSeccion('facturacion')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'facturacion', 'hover:bg-white/10': seccionActiva !== 'facturacion'}">
+                    Facturación CFDI
+                </a>
+            </nav>
+        </div>
+
+        <div class="pt-6 border-t border-white/20 text-xs opacity-75">
+            Sesión iniciada como Empleado
+        </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <!-- HEADER -->
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">
+                    Panel del Personal
+                </h2>
+                <p class="text-gray-400 text-sm mt-1">
+                    Control de operaciones de la sucursal en tiempo real
+                </p>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <span class="bg-red-50 text-red-600 px-4 py-2 rounded-full font-bold text-sm border border-red-100 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                    {{ obtenerCantidadPedidosNuevos() }} pedidos nuevos
+                </span>
+
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <span class="font-bold text-gray-800 block text-sm">{{ nombreEmpleado }}</span>
+                        <span class="text-xs text-gray-400 font-semibold block">Chef Principal</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-[#f6d76b] flex items-center justify-center font-extrabold text-gray-800 text-lg shadow-sm border border-[#f6d76b]/30">
+                        C
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTAS / SUB-COMPONENTES DINÁMICOS -->
+        <div class="mt-6">
+            <!-- TABLERO KANBAN -->
+            <app-tablero-kanban *ngIf="seccionActiva === 'pedidos'" 
+                                [pedidos]="listaPedidos" 
+                                (cambioEstado)="alCambiarEstadoPedido($event)">
+            </app-tablero-kanban>
+
+            <!-- VISTA COCINA -->
+            <app-vista-cocina *ngIf="seccionActiva === 'cocina'" 
+                              [pedidos]="listaPedidos" 
+                              (marcarListo)="alCambiarEstadoPedido({id: $event, nuevoEstado: 'Listo'})">
+            </app-vista-cocina>
+
+            <!-- VISTA ENTREGAS -->
+            <app-vista-entregas *ngIf="seccionActiva === 'entregas'" 
+                                [pedidos]="listaPedidos" 
+                                (cambioEstado)="alCambiarEstadoPedido($event)">
+            </app-vista-entregas>
+
+            <!-- VISTA INVENTARIO -->
+            <app-vista-inventario *ngIf="seccionActiva === 'inventario'" 
+                                  [inventario]="listaInventario" 
+                                  (solicitarReabastecimiento)="alReabastecerStock($event)">
+            </app-vista-inventario>
+
+            <!-- VISTA NOTIFICACIONES -->
+            <app-vista-notificaciones *ngIf="seccionActiva === 'notificaciones'" 
+                                      [notificaciones]="listaNotificaciones" 
+                                      (descartarNotificacion)="alDescartarNotificacion($event)" 
+                                      (limpiarTodo)="alLimpiarNotificaciones()">
+            </app-vista-notificaciones>
+
+            <!-- VISTA CORTE DE CAJA -->
+            <app-vista-corte *ngIf="seccionActiva === 'corte'"
+                             [pedidos]="listaPedidos"
+                             [nombreEmpleado]="nombreEmpleado"
+                             (corteEnviado)="alEnviarCorte($event)">
+            </app-vista-corte>
+
+            <!-- VISTA FACTURACIÓN -->
+            <app-facturacion-unificada *ngIf="seccionActiva === 'facturacion'">
+            </app-facturacion-unificada>
+        </div>
+    </main>
+</div>

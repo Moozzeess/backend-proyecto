@@ -1,0 +1,291 @@
+/**
+ * Estilos: procesar-compra.estilos.css
+ * Propósito: Define el diseño visual de la pantalla de checkout/procesamiento de compras.
+ * Dónde se utiliza: ProcesarCompraComponent (frontend/src/app/features/procesar-compra)
+ * Paleta principal: #f6d76b (Amarillo principal), #ff9036 (Naranja), #d6254d (Rojo principal), #ff5475 (Rosa), #fdeba9 (Amarillo claro)
+ */
+
+.checkout-wrapper {
+  min-height: 100vh;
+  background-color: #fdfaf2;
+  padding: 3rem 1.5rem;
+}
+
+.checkout-card {
+  background: white;
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 144, 54, 0.1);
+  overflow: hidden;
+}
+
+.checkout-header {
+  background: linear-gradient(135deg, #ff9036 0%, #d6254d 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.checkout-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.checkout-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* Formularios y Secciones */
+.seccion-tarjeta {
+  background: #fdfdfd;
+  border: 1.5px solid #f2f2f2;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+}
+
+.seccion-tarjeta:hover {
+  border-color: rgba(255, 144, 54, 0.3);
+  box-shadow: 0 5px 15px rgba(255, 144, 54, 0.05);
+}
+
+.seccion-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input-campo {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  background-color: white;
+  color: #1a202c;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-campo:focus {
+  border-color: #ff9036;
+  box-shadow: 0 0 0 3px rgba(255, 144, 54, 0.15);
+}
+
+/* Opciones de Selección de Botón (Radio oculto) */
+.selector-grupo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .selector-grupo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.selector-opcion {
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.selector-opcion.seleccionada {
+  border-color: #d6254d;
+  background-color: rgba(214, 37, 77, 0.03);
+}
+
+.selector-titulo {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.selector-descripcion {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+/* Resumen del Pedido */
+.resumen-contenedor {
+  background-color: #fafafa;
+  border-left: 1px solid #eee;
+  padding: 2.5rem 2rem;
+}
+
+@media (max-width: 1023px) {
+  .resumen-contenedor {
+    border-left: none;
+    border-top: 1px solid #eee;
+  }
+}
+
+.item-resumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.item-nombre {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.item-cantidad {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.item-precio {
+  font-weight: 700;
+  color: #1a202c;
+}
+
+/* Botones de Acción */
+.btn-pagar {
+  background: linear-gradient(135deg, #ff5475 0%, #d6254d 100%);
+  color: white;
+  width: 100%;
+  padding: 1.1rem;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(214, 37, 77, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-pagar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(214, 37, 77, 0.4);
+}
+
+.btn-pagar:active {
+  transform: translateY(0);
+}
+
+.btn-cancelar {
+  width: 100%;
+  padding: 1.1rem;
+  background: #f7fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 1rem;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  display: block;
+}
+
+.btn-cancelar:hover {
+  background: #edf2f7;
+  color: #2d3748;
+}
+
+/* Alertas */
+.alerta-error-checkout {
+  background-color: rgba(214, 37, 77, 0.08);
+  border: 1px solid rgba(214, 37, 77, 0.2);
+  color: #d6254d;
+  border-radius: 1rem;
+  padding: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Reglas de Modo Oscuro para el Procesamiento de Compra */
+.dark .checkout-wrapper {
+  background-color: #221B1C !important;
+}
+
+.dark .checkout-card {
+  background-color: #2D2426 !important;
+  border-color: #4B383C !important;
+}
+
+.dark .seccion-tarjeta {
+  background-color: #2D2426 !important;
+  border-color: #4B383C !important;
+}
+
+.dark .seccion-tarjeta:hover {
+  border-color: rgba(255, 144, 54, 0.4) !important;
+}
+
+.dark .seccion-titulo {
+  color: #FFF8E7 !important;
+}
+
+.dark .input-campo {
+  background-color: #3D2E31 !important;
+  color: #FFF8E7 !important;
+  border-color: #4B383C !important;
+}
+
+.dark .selector-opcion {
+  border-color: #4B383C !important;
+}
+
+.dark .selector-opcion.seleccionada {
+  border-color: #d6254d !important;
+  background-color: rgba(214, 37, 77, 0.08) !important;
+}
+
+.dark .selector-titulo {
+  color: #FFF8E7 !important;
+}
+
+.dark .selector-descripcion {
+  color: #D9CFC0 !important;
+}
+
+.dark .resumen-contenedor {
+  background-color: #3D2E31 !important;
+  border-color: #4B383C !important;
+}
+
+.dark .item-resumen {
+  border-bottom-color: #4B383C !important;
+}
+
+.dark .item-nombre {
+  color: #FFF8E7 !important;
+}
+
+.dark .item-cantidad {
+  color: #D9CFC0 !important;
+}
+
+.dark .item-precio {
+  color: #FFF8E7 !important;
+}
+
+.dark .btn-cancelar {
+  background: #3D2E31 !important;
+  border-color: #4B383C !important;
+  color: #FFF8E7 !important;
+}
+
+.dark .btn-cancelar:hover {
+  background: rgba(75, 56, 60, 0.5) !important;
+  color: #FFF8E7 !important;
+}
+

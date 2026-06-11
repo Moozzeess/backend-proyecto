@@ -1,0 +1,351 @@
+/*
+ * Propósito: Definir los estilos visuales premium para el componente exclusivo del menú.
+ * Dónde se utiliza: Utilizado en el componente MenuComponent (frontend/src/app/features/menu/menu.component.html).
+ */
+
+:root {
+  --color-fondo-menu: #ffffff;
+  --color-superficie: #fdeba9; /* Amarillo crema suave */
+  --color-superficie-resaltado: #f6d76b; /* Amarillo dorado */
+  --color-primario: #d6254d; /* Rojo carmín */
+  --color-primario-hover: #ff5475; /* Rosa/rojo vivo */
+  --color-naranja: #ff9036; /* Naranja brillante */
+  --color-texto-principal: #2d3436;
+  --color-texto-secundario: #636e72;
+  --color-borde: rgba(214, 37, 77, 0.15);
+  --sombra-premium: 0 8px 32px 0 rgba(214, 37, 77, 0.08);
+}
+
+.contenedor-menu {
+  background-color: var(--color-fondo-menu);
+  color: var(--color-texto-principal);
+  font-family: 'Outfit', 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  box-sizing: border-box;
+}
+
+.cabecera-menu {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.cabecera-menu h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-naranja) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+
+}
+
+.cabecera-menu p {
+  color: var(--color-texto-secundario);
+  font-size: 1.15rem;
+}
+
+/* Filtros y Controles */
+.controles-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.grupo-filtros {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.boton-filtro {
+  background-color: #fff;
+  color: var(--color-texto-principal);
+  border: 1px solid var(--color-borde);
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.boton-filtro:hover {
+  background-color: var(--color-superficie);
+  transform: translateY(-2px);
+}
+
+.boton-filtro.activo {
+  background-color: var(--color-primario);
+  color: #ffffff;
+  border-color: var(--color-primario);
+  box-shadow: 0 4px 15px rgba(214, 37, 77, 0.3);
+}
+
+/* Tabla del Menú */
+.tabla-contenedor {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--color-borde);
+  overflow-x: auto;
+  box-shadow: var(--sombra-premium);
+  margin-bottom: 2rem;
+}
+
+.tabla-menu {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabla-menu th {
+  padding: 1.25rem 1.5rem;
+  background-color: rgba(253, 235, 169, 0.4); /* FDEBA9 translúcido */
+  font-weight: 700;
+  color: var(--color-primario);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--color-borde);
+}
+
+.tabla-menu td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-borde);
+  color: var(--color-texto-secundario);
+  font-size: 0.95rem;
+  vertical-align: middle;
+  transition: background-color 0.2s ease;
+}
+
+.tabla-menu tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-menu tr:hover td {
+  background-color: rgba(253, 235, 169, 0.15);
+  color: var(--color-texto-principal);
+}
+
+/* Celdas específicas */
+.celda-imagen {
+  width: 80px;
+}
+
+.imagen-producto {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  box-shadow: 0 4px 10px rgba(214, 37, 77, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.imagen-producto:hover {
+  transform: scale(1.15);
+}
+
+.nombre-producto {
+  font-weight: 700;
+  color: var(--color-texto-principal);
+}
+
+.ingredientes-lista {
+  max-width: 300px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.etiqueta-categoria {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cat-pizza {
+  background-color: rgba(214, 37, 77, 0.1);
+  color: var(--color-primario);
+  border: 1px solid rgba(214, 37, 77, 0.2);
+}
+
+.cat-bebida {
+  background-color: rgba(255, 144, 54, 0.1);
+  color: var(--color-naranja);
+  border: 1px solid rgba(255, 144, 54, 0.2);
+}
+
+.cat-postre {
+  background-color: rgba(246, 215, 107, 0.2);
+  color: #b8860b;
+  border: 1px solid rgba(246, 215, 107, 0.4);
+}
+
+.etiqueta-tamano {
+  background-color: rgba(253, 235, 169, 0.3);
+  color: var(--color-texto-principal);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  border: 1px solid rgba(214, 37, 77, 0.15);
+}
+
+.precio-valor {
+  font-weight: 700;
+  color: var(--color-primario);
+  font-size: 1.15rem;
+}
+
+/* Paginación */
+.paginacion-contenedor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.paginacion-info {
+  color: var(--color-texto-secundario);
+  font-size: 0.9rem;
+}
+
+.paginacion-botones {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.boton-paginacion {
+  background-color: #ffffff;
+  color: var(--color-texto-principal);
+  border: 1px solid var(--color-borde);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.boton-paginacion:hover:not(:disabled) {
+  background-color: var(--color-superficie-resaltado);
+  border-color: var(--color-superficie-resaltado);
+}
+
+.boton-paginacion:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.boton-paginacion.activo {
+  background-color: var(--color-primario);
+  color: #ffffff;
+  border-color: var(--color-primario);
+  box-shadow: 0 4px 10px rgba(214, 37, 77, 0.2);
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .contenedor-menu {
+    padding: 2rem 1rem;
+  }
+  .controles-menu {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .grupo-filtros {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .tabla-menu th, .tabla-menu td {
+    padding: 1rem;
+  }
+}
+
+/* Reglas de Modo Oscuro para la Vista de Menú */
+.dark .contenedor-menu {
+  --color-fondo-menu: #221B1C;
+  --color-superficie: #2D2426;
+  --color-superficie-resaltado: #3D2E31;
+  --color-texto-principal: #FFF8E7;
+  --color-texto-secundario: #D9CFC0;
+  --color-borde: #4B383C;
+}
+
+.dark .tabla-contenedor {
+  background-color: #2D2426 !important;
+  border-color: #4B383C !important;
+}
+
+.dark .tabla-menu th {
+  background-color: #34282A !important;
+  border-bottom-color: #4B383C !important;
+}
+
+.dark .tabla-menu td {
+  border-bottom-color: #4B383C !important;
+}
+
+.dark .tabla-menu tr:hover td {
+  background-color: rgba(61, 46, 49, 0.4) !important;
+}
+
+.dark .boton-filtro {
+  background-color: #2D2426 !important;
+  border-color: #4B383C !important;
+  color: #FFF8E7 !important;
+}
+
+.dark .boton-filtro:hover {
+  background-color: #3D2E31 !important;
+}
+
+.dark .boton-filtro.activo {
+  background-color: var(--color-primario) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primario) !important;
+}
+
+.dark .boton-paginacion {
+  background-color: #2D2426 !important;
+  border-color: #4B383C !important;
+  color: #FFF8E7 !important;
+}
+
+.dark .boton-paginacion:hover:not(:disabled) {
+  background-color: #3D2E31 !important;
+}
+
+.dark .boton-paginacion.activo {
+  background-color: var(--color-primario) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primario) !important;
+}
+
+.dark .etiqueta-tamano {
+  background-color: #3D2E31 !important;
+  color: #FFF8E7 !important;
+  border-color: #4B383C !important;
+}
+
+.dark .cat-postre {
+  color: #f6d76b !important;
+  border-color: rgba(246, 215, 107, 0.3) !important;
+  background-color: rgba(246, 215, 107, 0.1) !important;
+}
+

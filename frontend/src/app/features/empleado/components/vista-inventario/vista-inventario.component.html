@@ -1,0 +1,75 @@
+<div class="mt-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h3 class="text-2xl font-bold text-gray-800">
+                Inventario de Insumos
+            </h3>
+            <p class="text-gray-500 text-sm mt-1">
+                Monitoreo de ingredientes y solicitud de reabastecimiento en cocina
+            </p>
+        </div>
+    </div>
+
+    <!-- LISTADO DE INGREDIENTES -->
+    <div class="card p-6 border border-gray-100">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-200 text-gray-400 text-sm font-semibold pb-4">
+                        <th class="py-3 px-4">Ingrediente</th>
+                        <th class="py-3 px-4">Stock Mínimo</th>
+                        <th class="py-3 px-4">Stock Actual</th>
+                        <th class="py-3 px-4">Nivel / Progreso</th>
+                        <th class="py-3 px-4">Estado</th>
+                        <th class="py-3 px-4 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr *ngFor="let item of inventario" class="hover:bg-gray-50/50 transition-colors">
+                        <td class="py-4 px-4 font-bold text-gray-800">
+                            {{ item.nombre }}
+                        </td>
+                        <td class="py-4 px-4 text-gray-500 text-sm">
+                            {{ item.stockMinimo }} {{ item.unidad }}
+                        </td>
+                        <td class="py-4 px-4 font-semibold text-gray-700">
+                            {{ item.stockActual }} {{ item.unidad }}
+                        </td>
+                        <td class="py-4 px-4 w-1/4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-gray-500 font-semibold w-10">
+                                    {{ calcularPorcentaje(item) }}%
+                                </span>
+                                <div class="bg-gray-200 h-2.5 rounded-full flex-1 overflow-hidden">
+                                    <div class="h-2.5 rounded-full transition-all duration-500" 
+                                         [ngClass]="{
+                                             'bg-red-500': esCritico(item),
+                                             'bg-yellow-500': !esCritico(item) && calcularPorcentaje(item) <= 50,
+                                             'bg-green-500': !esCritico(item) && calcularPorcentaje(item) > 50
+                                         }" 
+                                         [style.width.%]="calcularPorcentaje(item)">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold" 
+                                  [ngClass]="{
+                                      'bg-red-50 text-red-600': esCritico(item),
+                                      'bg-green-50 text-green-600': !esCritico(item)
+                                  }">
+                                {{ esCritico(item) ? 'Crítico' : 'Normal' }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                            <button (click)="reabastecer(item.id)" 
+                                    class="px-4 py-2 bg-[#d6254d] text-white font-bold rounded-lg text-xs hover:bg-[#ff5475] transition-colors cursor-pointer">
+                                Reabastecer +10
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

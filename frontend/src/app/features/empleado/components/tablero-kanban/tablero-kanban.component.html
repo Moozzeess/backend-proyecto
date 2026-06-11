@@ -1,0 +1,152 @@
+<div class="grid lg:grid-cols-4 gap-6 mt-10">
+    <!-- NUEVOS -->
+    <div class="card p-5 border-t-4 border-[#fdeba9]">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-xl text-gray-800">
+                Nuevos
+            </h3>
+            <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                {{ filtrarPedidos('Nuevo').length }}
+            </span>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngIf="filtrarPedidos('Nuevo').length === 0" class="text-center py-6 text-gray-400 text-sm">
+                Sin pedidos nuevos
+            </div>
+            <div *ngFor="let pedido of filtrarPedidos('Nuevo')" class="order-card bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex justify-between">
+                    <span class="font-bold text-gray-700">
+                        {{ pedido.id }}
+                    </span>
+                    <span class="status-new px-3 py-1 rounded-full text-xs font-semibold">
+                        Pendiente
+                    </span>
+                </div>
+
+                <p class="mt-3 text-gray-600 font-medium">
+                    {{ pedido.platillo }}
+                </p>
+
+                <button (click)="avanzarEstado(pedido)" class="w-full mt-4 bg-[#d6254d] text-white py-2.5 rounded-xl font-bold hover:bg-[#ff5475] transition-colors cursor-pointer text-sm">
+                    Tomar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREPARANDO -->
+    <div class="card p-5 border-t-4 border-[#ff9036]">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-xl text-gray-800">
+                Preparando
+            </h3>
+            <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                {{ filtrarPedidos('Preparando').length }}
+            </span>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngIf="filtrarPedidos('Preparando').length === 0" class="text-center py-6 text-gray-400 text-sm">
+                Sin pedidos en preparación
+            </div>
+            <div *ngFor="let pedido of filtrarPedidos('Preparando')" class="order-card bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex justify-between">
+                    <span class="font-bold text-gray-700">
+                        {{ pedido.id }}
+                    </span>
+                    <span class="status-preparing px-3 py-1 rounded-full text-xs font-semibold">
+                        Cocinando
+                    </span>
+                </div>
+
+                <p class="mt-3 text-gray-600 font-medium">
+                    {{ pedido.platillo }}
+                </p>
+
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <span>Progreso</span>
+                        <span>{{ pedido.progreso }}%</span>
+                    </div>
+                    <div class="bg-gray-200 h-3 rounded-full overflow-hidden">
+                        <div class="bg-[#ff9036] h-3 rounded-full transition-all duration-500" [style.width.%]="pedido.progreso">
+                        </div>
+                    </div>
+                </div>
+
+                <button (click)="avanzarEstado(pedido)" class="w-full mt-4 bg-[#ff9036] text-white py-2.5 rounded-xl font-bold hover:bg-[#ffaa66] transition-colors cursor-pointer text-sm">
+                    Marcar Listo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTOS -->
+    <div class="card p-5 border-t-4 border-[#16a34a]">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-xl text-gray-800">
+                Listos
+            </h3>
+            <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                {{ filtrarPedidos('Listo').length }}
+            </span>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngIf="filtrarPedidos('Listo').length === 0" class="text-center py-6 text-gray-400 text-sm">
+                Sin pedidos listos
+            </div>
+            <div *ngFor="let pedido of filtrarPedidos('Listo')" class="order-card bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex justify-between">
+                    <span class="font-bold text-gray-700">
+                        {{ pedido.id }}
+                    </span>
+                    <span class="status-ready px-3 py-1 rounded-full text-xs font-semibold">
+                        Listo
+                    </span>
+                </div>
+
+                <p class="mt-3 text-gray-600 font-medium">
+                    {{ pedido.platillo }}
+                </p>
+
+                <button (click)="avanzarEstado(pedido)" class="w-full mt-4 bg-green-600 text-white py-2.5 rounded-xl font-bold hover:bg-green-700 transition-colors cursor-pointer text-sm">
+                    Marcar Entregado
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENTREGADOS -->
+    <div class="card p-5 border-t-4 border-gray-400">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-xl text-gray-800">
+                Entregados
+            </h3>
+            <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                {{ filtrarPedidos('Entregado').length }}
+            </span>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngIf="filtrarPedidos('Entregado').length === 0" class="text-center py-6 text-gray-400 text-sm">
+                Sin pedidos entregados hoy
+            </div>
+            <div *ngFor="let pedido of filtrarPedidos('Entregado')" class="order-card bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="flex justify-between">
+                    <span class="font-bold text-gray-700">
+                        {{ pedido.id }}
+                    </span>
+                    <span class="status-delivered px-3 py-1 rounded-full text-xs font-semibold">
+                        Finalizado
+                    </span>
+                </div>
+
+                <p class="mt-3 text-gray-600 font-medium">
+                    {{ pedido.platillo }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
