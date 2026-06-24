@@ -1,7 +1,6 @@
 -- =============================================
 -- SISTEMA DE GESTIÓN PARA PIZZERÍA
 -- Script de Creación de Base de Datos
--- 1.1 | Junio 2026
 -- =============================================
 
 CREATE DATABASE IF NOT EXISTS pizzeria_db
@@ -123,27 +122,6 @@ INSERT INTO Sucursal (idSucursal, nombre, direccion, telefono, horario) VALUES
 (1, 'Sucursal Centro', 'Av. Juárez #102, Col. Centro', '5512345678', '11:00 AM - 10:00 PM'),
 (2, 'Sucursal Norte', 'Blvd. Diaz Ordaz #405, Col. Las Torres', '5587654321', '11:00 AM - 11:00 PM'),
 (3, 'Sucursal Sur', 'Calzada Tlalpan #2030, Col. Portales', '5598765432', '12:00 PM - 10:00 PM');
-
--- 2. Usuarios (Contraseña de prueba encriptada por defecto para todos: '123456')
--- Hash bcrypt de '123456': $2b$10$EPY93KbOOC.hK97jM.74oOXo/k3HwQdCsnUpxu05/eW30T78X/06q
--- Correos cifrados con AES-256-CBC determinista
-INSERT INTO Usuario (idUsuario, correo, contrasena, rol) VALUES
-(1, '40ef1cf9f8a70cd3b5af85beedf8cb0f5706f37263a633cbcd39e9af5075b573', '$2b$10$EPY93KbOOC.hK97jM.74oOXo/k3HwQdCsnUpxu05/eW30T78X/06q', 'administrador'),
-(2, 'b64117393e6dafb6acb227497ff541ebacda4531d4b505bf094f596f43e47fb1', '$2b$10$EPY93KbOOC.hK97jM.74oOXo/k3HwQdCsnUpxu05/eW30T78X/06q', 'empleado'),
-(3, 'c7dd30683b1b6a999faba21e3f6f050172838485f8792aa3e2899fd40e4f2f46', '$2b$10$EPY93KbOOC.hK97jM.74oOXo/k3HwQdCsnUpxu05/eW30T78X/06q', 'empleado'),
-(4, '69980dbe7cd6414f178c515609c7a064feffe96099d534cf55b5aee4074a2127', '$2b$10$EPY93KbOOC.hK97jM.74oOXo/k3HwQdCsnUpxu05/eW30T78X/06q', 'cliente'),
-(5, '622afff451e43cb83e1c30697b894f533bdfe1e9b748d6325d93042ee88c62cc', '$2b$10$EPY93KbOOC.hK97jM.74oOXo/k3HwQdCsnUpxu05/eW30T78X/06q', 'cliente');
-
--- 3. Empleados
-INSERT INTO Empleado (idEmpleado, nombre, apellido, puesto, salario, idSucursal, idUsuario) VALUES
-(1, 'Alejandro', 'Gómez', 'Chef Pizzero', 12500.00, 1, 2),
-(2, 'Beatriz', 'Solís', 'Cajera General', 9800.00, 1, 3);
-
--- 4. Clientes
--- Telefono y dirección cifrados con AES-256-CBC aleatorio (no determinista)
-INSERT INTO Cliente (idCliente, nombre, apellido, telefono, direccion, idUsuario) VALUES
-(1, 'Juan', 'Pérez', 'ba898758a84b833c43d8bc494a6c697b:227aba4b83a9ecd5c407549fad9c24f2', '6ce0e858e35b305578902ae65f224777:9a24238d890808a60a42227d32996f1f4a8ea4cd206fc7679d293560c28edc2e', 4),
-(2, 'Karen', 'López', '7f5196fc10a4f94e5fb1320ebe66f3b1:a5ada33d7f1c7a2426d3b87e23509606', '595c8f49eb23a16c24d7a9e76ed6438e:6354555da91a55865d4194776378651be75304d9950e1f36abd7a8866fd1bf9cd6863a81c0c0484ea321f91645740a24', 5);
 
 -- 5. Productos
 INSERT INTO Producto (idProducto, nombre, descripcion, precio, categoria, disponible) VALUES

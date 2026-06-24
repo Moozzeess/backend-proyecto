@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmpleadoAdmin } from '../../administrador.component';
+import { GeneradorDocumentosService } from '../../../../core/services/generador-documentos.service';
 
 /**
  * Componente: EmpleadosComponent
@@ -16,6 +17,8 @@ import { EmpleadoAdmin } from '../../administrador.component';
   templateUrl: './empleados.component.html'
 })
 export class EmpleadosComponent {
+  private generadorDocumentos = inject(GeneradorDocumentosService);
+
   @Input() listaEmpleados: EmpleadoAdmin[] = [];
 
   @Output() guardar = new EventEmitter<EmpleadoAdmin>();
@@ -28,7 +31,7 @@ export class EmpleadosComponent {
   mostrarModalEmpleado: boolean = false;
 
   private valoresPorDefectoEmpleado(): EmpleadoAdmin {
-    return { id: 0, nombre: '', puesto: '', sucursal: 'Sucursal Centro', salario: 0, estado: 'Activo' };
+    return { id: 0, nombre: '', puesto: 'Chef Pizzero', sucursal: 'Sucursal Centro', salario: 0, estado: 'Activo', correo: '', contrasena: '' };
   }
 
   abrirAgregarEmpleado(): void {
@@ -48,11 +51,31 @@ export class EmpleadosComponent {
       this.errorAlerta.emit('Por favor complete todos los datos del empleado.');
       return;
     }
+    if (!this.esEdicionEmpleado && (!this.empleadoSeleccionado.correo?.trim() || !this.empleadoSeleccionado.contrasena?.trim())) {
+      this.errorAlerta.emit('Es obligatorio proveer un correo y contraseña para crear la cuenta de acceso del empleado.');
+      return;
+    }
     this.guardar.emit(this.empleadoSeleccionado);
     this.mostrarModalEmpleado = false;
   }
 
   cambiarEstado(empleadoId: number): void {
     this.conmutarEstado.emit(empleadoId);
+  }
+
+  /**
+   * Intención: Descargar en PDF el estado de cuenta laboral del empleado.
+   */
+  descargarEstadoCuentaPDF(empleado: EmpleadoAdmin): void {
+    this.generadorDocumentos.descargarEstadoCuentaPDF(empleado);
+    this.exitoAlerta.emit(`Estado de cuenta en PDF descargado para ${empleado.nombre}.`);
+  }
+
+  /**
+   * Intención: Descargar en XML el estado de cuenta laboral del empleado.
+   */
+  descargarEstadoCuentaXML(empleado: EmpleadoAdmin): void {
+    this.generadorDocumentos.descargarEstadoCuentaXML(empleado);
+    this.exitoAlerta.emit(`Estado de cuenta en XML descargado para ${empleado.nombre}.`);
   }
 }

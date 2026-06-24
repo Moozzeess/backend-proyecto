@@ -16,4 +16,7 @@ export interface Usuario {
   
   /** Rol asignado para el control de acceso en la aplicación */
   rol: 'cliente' | 'empleado' | 'admin';
+
+  /** Puesto laboral específico para el rol de empleado */
+  puesto?: string;
 }

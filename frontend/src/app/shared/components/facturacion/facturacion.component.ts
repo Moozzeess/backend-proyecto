@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { PedidoService, PedidoHistorico } from '../../../core/services/pedido.service';
 import { AutenticacionService } from '../../../core/services/autenticacion.service';
 import { AlertasService } from '../../../core/services/alertas.service';
+import { GeneradorDocumentosService } from '../../../core/services/generador-documentos.service';
 
 /**
  * Interfaz para modelar una Factura (CFDI) dentro del flujo.
@@ -47,6 +48,7 @@ export class FacturacionComponent implements OnInit {
   public servicioAuth = inject(AutenticacionService);
   private servicioAlertas = inject(AlertasService);
   private router = inject(Router);
+  private generadorDocumentos = inject(GeneradorDocumentosService);
 
   // Exponer objeto Math global a la plantilla
   readonly Math = Math;
@@ -298,21 +300,45 @@ export class FacturacionComponent implements OnInit {
   }
 
   /**
-   * Intención: Descargar de forma simulada el archivo PDF.
+   * Intención: Descargar la factura activa en formato PDF.
    * Retorno: void.
    */
   descargarPDF(): void {
     if (!this.facturaActiva) return;
+    this.generadorDocumentos.descargarFacturaPDF(this.facturaActiva);
     this.mostrarExito(`Descargando PDF de la factura ${this.facturaActiva.id}...`);
   }
 
   /**
-   * Intención: Descargar de forma simulada el archivo XML.
+   * Intención: Descargar la factura activa en formato XML.
    * Retorno: void.
    */
   descargarXML(): void {
     if (!this.facturaActiva) return;
+    this.generadorDocumentos.descargarFacturaXML(this.facturaActiva);
     this.mostrarExito(`Descargando XML de la factura ${this.facturaActiva.id}...`);
+  }
+
+  /**
+   * Intención: Descargar una factura seleccionada en formato PDF desde el historial.
+   * Parámetros:
+   *   - factura (any): Objeto factura.
+   * Retorno: void.
+   */
+  descargarFacturaPDF(factura: any): void {
+    this.generadorDocumentos.descargarFacturaPDF(factura);
+    this.mostrarExito(`Descargando PDF de la factura ${factura.id}...`);
+  }
+
+  /**
+   * Intención: Descargar una factura seleccionada en formato XML desde el historial.
+   * Parámetros:
+   *   - factura (any): Objeto factura.
+   * Retorno: void.
+   */
+  descargarFacturaXML(factura: any): void {
+    this.generadorDocumentos.descargarFacturaXML(factura);
+    this.mostrarExito(`Descargando XML de la factura ${factura.id}...`);
   }
 
   /**

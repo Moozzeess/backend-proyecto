@@ -118,7 +118,9 @@
         <!-- RENDERIZADO DINÁMICO DE SUBCOMPONENTES DESACOPLADOS -->
         <app-admin-dashboard *ngIf="seccionActiva === 'dashboard'"
                              [ventasHoyPesos]="ventasHoyPesos"
-                             [cantidadPedidos]="cantidadPedidos"></app-admin-dashboard>
+                             [cantidadPedidos]="cantidadPedidos"
+                             [clientesActivos]="clientesActivos"
+                             [ticketPromedio]="ticketPromedio"></app-admin-dashboard>
 
         <app-admin-productos *ngIf="seccionActiva === 'productos'"
                              [listaProductos]="listaProductos"

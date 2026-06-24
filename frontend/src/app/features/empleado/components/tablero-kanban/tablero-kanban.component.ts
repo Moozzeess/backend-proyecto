@@ -28,6 +28,7 @@ export interface PedidoCocina {
   templateUrl: './tablero-kanban.component.html'
 })
 export class TableroKanbanComponent {
+
   /**
    * Colección de pedidos recibida desde el componente padre.
    */
@@ -37,6 +38,11 @@ export class TableroKanbanComponent {
    * Emisor de eventos para notificar cambios de estado en los pedidos al componente padre.
    */
   @Output() cambioEstado = new EventEmitter<{ id: string; nuevoEstado: 'Nuevo' | 'Preparando' | 'Listo' | 'Entregado' }>();
+
+  /**
+   * Emisor de eventos para solicitar cambiar de sección hacia la toma de comandas físicas en sucursal.
+   */
+  @Output() solicitarRegistroSucursal = new EventEmitter<void>();
 
   /**
    * Intención: Filtrar los pedidos correspondientes a una columna o estado específico.

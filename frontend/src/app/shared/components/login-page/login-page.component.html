@@ -88,10 +88,26 @@
                         <form *ngIf="modoRegistro()" (ngSubmit)="registrarUsuario()" class="mt-8">
                             <div>
                                 <label class="block mb-2 text-gray-600 font-medium">
-                                    Nombre completo
+                                    Nombre
                                 </label>
                                 <input type="text" name="nombre" [ngModel]="nombre()"
-                                    (ngModelChange)="nombre.set($event)" required placeholder="Tu nombre y apellido"
+                                    (ngModelChange)="nombre.set($event)" required placeholder="Tu nombre"
+                                    class="input-style">
+                            </div>
+                            <div class="mt-5">
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Apellido
+                                </label>
+                                <input type="text" name="apellido" [ngModel]="apellido()"
+                                    (ngModelChange)="apellido.set($event)" required placeholder="Tu apellido"
+                                    class="input-style">
+                            </div>
+                            <div class="mt-5">
+                                <label class="block mb-2 text-gray-600 font-medium">
+                                    Teléfono (10 dígitos)
+                                </label>
+                                <input type="tel" name="telefono" [ngModel]="telefono()"
+                                    (ngModelChange)="telefono.set($event)" required placeholder="5512345678"
                                     class="input-style">
                             </div>
                             <div class="mt-5">

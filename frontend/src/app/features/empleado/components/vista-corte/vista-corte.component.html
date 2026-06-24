@@ -18,9 +18,19 @@
         <!-- CARD RESUMEN GENERAL -->
         <div class="lg:col-span-2 space-y-6">
             
-            <div *ngIf="corteDeHoyEnviado" class="p-6 bg-green-50 border border-green-200 text-green-700 rounded-3xl font-semibold text-sm flex items-center gap-3">
-                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                El corte de caja de hoy ha sido enviado correctamente y está en espera de aprobación por el administrador.
+            <div *ngIf="corteDeHoyEnviado" class="p-6 bg-green-50 border border-green-200 text-green-700 rounded-3xl font-semibold text-sm flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                    <span>El corte de caja de hoy ha sido enviado correctamente y está en espera de aprobación por el administrador.</span>
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <button type="button" (click)="descargarCortePDF()" class="bg-[#d6254d] hover:bg-[#ff5475] text-white px-4 py-2 rounded-full font-bold shadow-md transition-all cursor-pointer text-xs flex items-center gap-1.5">
+                        Descargar PDF
+                    </button>
+                    <button type="button" (click)="descargarCorteXML()" class="bg-[#ff9036] hover:bg-[#fdeba9] hover:text-gray-800 text-white px-4 py-2 rounded-full font-bold shadow-md transition-all cursor-pointer text-xs flex items-center gap-1.5">
+                        Descargar XML
+                    </button>
+                </div>
             </div>
 
             <div class="card p-8 border border-gray-100">

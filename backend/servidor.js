@@ -7,6 +7,7 @@ const { probarConexion } = require('./configuracion/conexion');
 const registrador = require('./utilidades/registrador.utilidad');
 const registrarSolicitud = require('./middlewares/solicitudes.middleware');
 const manejadorErroresGlobal = require('./middlewares/error.middleware');
+const CorreoServicio = require('./servicios/correo.servicio');
 
 const app = express();
 const PUERTO = process.env.PUERTO || 3000;
@@ -53,8 +54,19 @@ app.get('/api/estado', async (peticion, respuesta) => {
 app.use(manejadorErroresGlobal);
 
 // Iniciar el servidor
-app.listen(PUERTO, () => {
+app.listen(PUERTO, async () => {
   registrador.info(`Servidor backend corriendo exitosamente en http://localhost:${PUERTO}`);
+  
+  // Validar conexión inicial a la base de datos
+  const baseDatosConectada = await probarConexion();
+  if (baseDatosConectada) {
+    registrador.info('Conexión inicial a la base de datos MySQL establecida correctamente.');
+  } else {
+    registrador.error('No se pudo establecer la conexión inicial a la base de datos MySQL. Verifique las credenciales y el estado del servicio.');
+  }
+
+  // Validar conexión inicial del correo emisor
+  await CorreoServicio.verificarConexion();
 });
 
 module.exports = app;

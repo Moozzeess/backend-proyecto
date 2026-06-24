@@ -1,88 +1,166 @@
 <div class="space-y-8 animate-fadeIn">
-    <div class="flex justify-between items-center">
+    <!-- Encabezado Principal -->
+    <div class="flex justify-between items-center pb-4 border-b border-gray-100">
         <div>
             <h2 class="text-4xl font-extrabold text-gray-800">Directorio de Empleados</h2>
-            <p class="text-gray-500 mt-1">Control de roles, sucursales y salarios corporativos</p>
+            <p class="text-gray-500 mt-1">Control de roles, sucursales y salarios corporativos en tiempo real</p>
         </div>
-        <button (click)="abrirAgregarEmpleado()" class="px-5 py-3 bg-[#d6254d] text-white font-bold rounded-xl shadow hover:bg-[#ff5475]">
-            + Nuevo Empleado
+        <button *ngIf="!mostrarModalEmpleado" (click)="abrirAgregarEmpleado()" 
+                class="px-5 py-3 bg-[#d6254d] text-white font-bold rounded-xl shadow-lg hover:bg-[#ff5475] transition-all cursor-pointer border-none flex items-center gap-2">
+            <span>+ Nuevo Empleado</span>
         </button>
     </div>
 
-    <div class="card overflow-hidden">
-        <table class="w-full">
-            <thead>
-                <tr class="bg-gray-50 border-b border-gray-100">
-                    <th class="text-left p-6 text-sm font-bold text-gray-500">Nombre</th>
-                    <th class="text-left p-6 text-sm font-bold text-gray-500">Puesto</th>
-                    <th class="text-left p-6 text-sm font-bold text-gray-500">Sucursal</th>
-                    <th class="text-left p-6 text-sm font-bold text-gray-500">Salario Mensual</th>
-                    <th class="text-left p-6 text-sm font-bold text-gray-500">Estatus</th>
-                    <th class="text-right p-6 text-sm font-bold text-gray-500">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let emp of listaEmpleados" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td class="p-6 font-bold text-gray-700">{{ emp.nombre }}</td>
-                    <td class="p-6 text-gray-600 font-semibold">{{ emp.puesto }}</td>
-                    <td class="p-6 text-gray-500">{{ emp.sucursal }}</td>
-                    <td class="p-6 font-bold text-gray-800">${{ emp.salario | number }}</td>
-                    <td class="p-6">
+    <!-- Contenedor Dividido en Dos Columnas (Lista a la izquierda y Formulario Integrado a la derecha) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Columna de Lista de Empleados (Ocupa 2 columnas en pantallas grandes si el formulario está abierto, o las 3 si está cerrado) -->
+        <div [ngClass]="mostrarModalEmpleado ? 'lg:col-span-2' : 'lg:col-span-3'" class="space-y-6">
+            <!-- Grid de Tarjetas de Empleados -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" [ngClass]="mostrarModalEmpleado ? 'lg:grid-cols-2' : 'lg:grid-cols-3'">
+                <div *ngFor="let emp of listaEmpleados" 
+                     class="card p-6 flex flex-col justify-between border border-gray-100 hover:shadow-xl hover:border-transparent transition-all duration-300 relative group animate-fadeIn"
+                     [class.ring-2]="mostrarModalEmpleado && empleadoSeleccionado.id === emp.id"
+                     [class.ring-[#d6254d]]="mostrarModalEmpleado && empleadoSeleccionado.id === emp.id">
+                    
+                    <!-- Encabezado de Tarjeta y Badge de Estado -->
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-[#fdeba9] text-[#d6254d] flex items-center justify-center font-black text-lg shadow-inner">
+                                {{ emp.nombre.substring(0, 1) }}
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-gray-800 tracking-tight text-lg group-hover:text-[#d6254d] transition-colors">
+                                    {{ emp.nombre }}
+                                </h4>
+                                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">{{ emp.puesto }}</p>
+                            </div>
+                        </div>
+                        
                         <span [class.bg-green-50]="emp.estado === 'Activo'"
                               [class.text-green-600]="emp.estado === 'Activo'"
                               [class.bg-gray-100]="emp.estado === 'Inactivo'"
                               [class.text-gray-500]="emp.estado === 'Inactivo'"
-                              class="px-3 py-1 font-bold rounded-full text-xs">
+                              class="px-2.5 py-1 font-bold rounded-lg text-[10px] tracking-wider uppercase">
                             {{ emp.estado }}
                         </span>
-                    </td>
-                    <td class="p-6 text-right flex justify-end gap-2 mt-2">
-                        <button (click)="abrirEditarEmpleado(emp)" class="px-3 py-1.5 bg-yellow-50 text-yellow-600 rounded-lg text-xs font-bold hover:bg-yellow-100">
+                    </div>
+
+                    <!-- Detalles del Empleado -->
+                    <div class="space-y-2 py-3 border-t border-b border-gray-50 my-2">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-gray-400">Correo Acceso</span>
+                            <span class="text-gray-700 font-bold truncate max-w-[150px]" [title]="emp.correo">{{ emp.correo || 'Sin correo' }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-gray-400">Sucursal</span>
+                            <span class="text-gray-700 font-bold">{{ emp.sucursal }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-gray-400">Salario Mensual</span>
+                            <span class="text-gray-800 font-black">${{ emp.salario | number:'1.2-2' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas (Alineación Grid de 2x2 para Botones) -->
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button (click)="descargarEstadoCuentaPDF(emp)" 
+                                class="px-2 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl text-xs font-bold transition-all cursor-pointer border-none text-center">
+                            PDF Est.
+                        </button>
+                        <button (click)="descargarEstadoCuentaXML(emp)" 
+                                class="px-2 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl text-xs font-bold transition-all cursor-pointer border-none text-center">
+                            XML Est.
+                        </button>
+                        <button (click)="abrirEditarEmpleado(emp)" 
+                                class="px-2 py-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-xl text-xs font-bold transition-all cursor-pointer border-none text-center">
                             Editar
                         </button>
-                        <button (click)="cambiarEstado(emp.id)" class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-100">
-                            Conmutar Estatus
+                        <button (click)="cambiarEstado(emp.id)" 
+                                class="px-2 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-xs font-bold transition-all cursor-pointer border-none text-center">
+                            Conmutar
                         </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- MODAL EMPLEADO -->
-    <div *ngIf="mostrarModalEmpleado" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6">
-            <h3 class="text-2xl font-bold text-gray-800">{{ esEdicionEmpleado ? 'Modificar Empleado' : 'Registrar Empleado' }}</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Nombre Completo</label>
-                    <input type="text" [(ngModel)]="empleadoSeleccionado.nombre" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Puesto</label>
-                    <input type="text" [(ngModel)]="empleadoSeleccionado.puesto" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Sucursal Asignada</label>
-                    <select [(ngModel)]="empleadoSeleccionado.sucursal" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
-                        <option value="Sucursal Centro">Sucursal Centro</option>
-                        <option value="Sucursal Norte">Sucursal Norte</option>
-                        <option value="Sucursal Sur">Sucursal Sur</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Salario Mensual ($ MXN)</label>
-                    <input type="number" [(ngModel)]="empleadoSeleccionado.salario" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d]">
+                    </div>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 pt-4">
-                <button (click)="mostrarModalEmpleado = false" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl">
+        </div>
+
+        <!-- Columna de Panel del Formulario Integrado Lateral (Ocupa 1 columna si está abierto) -->
+        <div *ngIf="mostrarModalEmpleado" class="card p-6 border border-gray-100 shadow-xl space-y-6 sticky top-6 animate-fadeIn">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                <div>
+                    <h3 class="text-xl font-black text-gray-800 tracking-tight">
+                        {{ esEdicionEmpleado ? 'Modificar Datos' : 'Nuevo Empleado' }}
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Gestione la nómina e información del personal</p>
+                </div>
+                <button (click)="mostrarModalEmpleado = false" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border-none cursor-pointer">
+                    ✕
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre Completo</label>
+                    <input type="text" [(ngModel)]="empleadoSeleccionado.nombre" 
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d] focus:border-transparent transition-all text-sm text-gray-700 font-semibold"
+                           placeholder="Ej. Alejandro Gómez">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Correo Electrónico (Acceso)</label>
+                    <input type="email" [(ngModel)]="empleadoSeleccionado.correo" 
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d] focus:border-transparent transition-all text-sm text-gray-700 font-semibold"
+                           placeholder="Ej. alejandro@pizzapizza.com">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Contraseña</label>
+                    <input type="password" [(ngModel)]="empleadoSeleccionado.contrasena" 
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d] focus:border-transparent transition-all text-sm text-gray-700 font-semibold"
+                           placeholder="••••••••">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Puesto de Trabajo</label>
+                    <select [(ngModel)]="empleadoSeleccionado.puesto" 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d] focus:border-transparent transition-all text-sm text-gray-700 font-semibold bg-white">
+                        <option value="Chef Pizzero">Chef Pizzero</option>
+                        <option value="Cajero General">Cajero General</option>
+                        <option value="Repartidor Motociclista">Repartidor Motociclista</option>
+                        <option value="Administrador de Sucursal">Administrador de Sucursal</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Salario Mensual ($ MXN)</label>
+                    <input type="number" [(ngModel)]="empleadoSeleccionado.salario" 
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d] focus:border-transparent transition-all text-sm text-gray-700 font-semibold"
+                           placeholder="Ej. 12500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sucursal Asignada</label>
+                    <select [(ngModel)]="empleadoSeleccionado.sucursal" 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#d6254d] focus:border-transparent transition-all text-sm text-gray-700 font-semibold bg-white">
+                        <option value="Sucursal Centro">Sucursal Centro (Juárez #102)</option>
+                        <option value="Sucursal Norte">Sucursal Norte (Díaz Ordaz #405)</option>
+                        <option value="Sucursal Sur">Sucursal Sur (Calzada Tlalpan #2030)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
+                <button (click)="mostrarModalEmpleado = false" 
+                        class="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition-colors text-sm cursor-pointer border-none">
                     Cancelar
                 </button>
-                <button (click)="guardarEmpleado()" class="px-5 py-2.5 bg-[#d6254d] text-white font-bold rounded-xl shadow-lg hover:bg-[#ff5475]">
-                    Guardar Empleado
+                <button (click)="guardarEmpleado()" 
+                        class="px-5 py-3 bg-[#d6254d] hover:bg-[#ff5475] text-white font-bold rounded-xl shadow-lg shadow-[#d6254d]/20 transition-all text-sm cursor-pointer border-none">
+                    {{ esEdicionEmpleado ? 'Guardar Cambios' : 'Registrar' }}
                 </button>
             </div>
         </div>
+
     </div>
 </div>

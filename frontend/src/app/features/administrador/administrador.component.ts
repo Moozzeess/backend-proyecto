@@ -7,16 +7,11 @@ import { AutenticacionService } from '../../core/services/autenticacion.service'
 // Servicios
 import { PedidoService, PedidoHistorico } from '../../core/services/pedido.service';
 import { AlertasService, AlertaError } from '../../core/services/alertas.service';
-
-// Modelos y Datos
-import {
-  PRODUCTOS_MOCK,
-  INGREDIENTES_MOCK,
-  EMPLEADOS_MOCK,
-  SUCURSALES_MOCK,
-  FACTURAS_MOCK,
-  ProductoSimulado
-} from '../../core/models/datos-simulados';
+import { ProductosService } from '../../core/services/productos.service';
+import { EmpleadoService } from '../../core/services/empleado.service';
+import { SucursalService } from '../../core/services/sucursal.service';
+import { InventarioService } from '../../core/services/inventario.service';
+import { FacturaService } from '../../core/services/factura.service';
 
 // Subcomponentes Desacoplados
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -54,6 +49,8 @@ export interface EmpleadoAdmin {
   sucursal: string;
   salario: number;
   estado: 'Activo' | 'Inactivo';
+  correo?: string;
+  contrasena?: string;
 }
 
 export interface SucursalAdmin {
@@ -109,6 +106,13 @@ export class AdministradorComponent implements OnInit {
   private autenticacionService = inject(AutenticacionService);
   private router = inject(Router);
 
+  // Inyección de servicios del administrador
+  private productosService = inject(ProductosService);
+  private empleadoService = inject(EmpleadoService);
+  private sucursalService = inject(SucursalService);
+  private inventarioService = inject(InventarioService);
+  private facturaService = inject(FacturaService);
+
   /**
    * Intención: Finalizar la sesión del administrador activo y redirigir al login.
    * Parámetros: Ninguno.
@@ -121,8 +125,10 @@ export class AdministradorComponent implements OnInit {
 
   // Información del Administrador
   nombreRol: string = 'Administrador General';
-  ventasHoyPesos: number = 48920;
-  cantidadPedidos: number = 347;
+  ventasHoyPesos: number = 0;
+  cantidadPedidos: number = 0;
+  clientesActivos: number = 0;
+  ticketPromedio: number = 0;
 
   // Estado del Sidebar / Menú
   seccionActiva: 'dashboard' | 'productos' | 'inventario' | 'pedidos' | 'empleados' | 'sucursales' | 'reportes' | 'configuracion' | 'facturacion' = 'dashboard';
@@ -163,12 +169,59 @@ export class AdministradorComponent implements OnInit {
   pedidoParaFacturar: PedidoHistorico | null = null;
 
   ngOnInit(): void {
-    // Inicializar colecciones desde constantes de datos simulados
-    this.listaProductos = JSON.parse(JSON.stringify(PRODUCTOS_MOCK));
-    this.listaIngredientes = JSON.parse(JSON.stringify(INGREDIENTES_MOCK));
-    this.listaEmpleados = JSON.parse(JSON.stringify(EMPLEADOS_MOCK));
-    this.listaSucursales = JSON.parse(JSON.stringify(SUCURSALES_MOCK));
-    this.listaFacturas = JSON.parse(JSON.stringify(FACTURAS_MOCK));
+    this.cargarDatosAdministrador();
+  }
+
+  /**
+   * Consulta toda la información administrativa en tiempo real desde el backend.
+   * Intención: Llenar colecciones de productos, sucursales, inventario, facturas y empleados.
+   */
+  cargarDatosAdministrador(): void {
+    // Cargar KPIs del Dashboard en tiempo real
+    this.servicioPedidos.obtenerKpisDiarios().subscribe({
+      next: (kpis) => {
+        this.ventasHoyPesos = kpis.ventasHoy;
+        this.cantidadPedidos = kpis.pedidosHoy;
+        this.clientesActivos = kpis.clientesActivos;
+        this.ticketPromedio = kpis.ticketPromedio;
+      },
+      error: () => this.mostrarAlertaError('Error al cargar KPIs financieros del día.')
+    });
+
+    this.productosService.obtenerProductos().subscribe({
+      next: (res: any) => {
+        this.listaProductos = res.map((p: any) => ({
+          id: p.id,
+          nombre: p.nombre,
+          descripcion: p.descripcion || '',
+          precio: p.precio,
+          categoria: p.categoria,
+          tamano: p.tamano || 'familiar',
+          ingredientes: []
+        }));
+      },
+      error: () => this.mostrarAlertaError('Error al cargar catálogo de productos.')
+    });
+
+    this.empleadoService.obtenerEmpleados().subscribe({
+      next: (datos) => this.listaEmpleados = datos,
+      error: () => this.mostrarAlertaError('Error al cargar empleados.')
+    });
+
+    this.sucursalService.obtenerSucursales().subscribe({
+      next: (datos) => this.listaSucursales = datos,
+      error: () => this.mostrarAlertaError('Error al cargar sucursales.')
+    });
+
+    this.inventarioService.obtenerIngredientes().subscribe({
+      next: (datos) => this.listaIngredientes = datos,
+      error: () => this.mostrarAlertaError('Error al cargar inventario.')
+    });
+
+    this.facturaService.obtenerFacturas().subscribe({
+      next: (datos) => this.listaFacturas = datos,
+      error: () => this.mostrarAlertaError('Error al cargar facturas.')
+    });
   }
 
   cambiarSeccion(seccion: typeof this.seccionActiva): void {
@@ -190,6 +243,7 @@ export class AdministradorComponent implements OnInit {
 
   // --- CONTROL DE PRODUCTOS (Hijo -> Padre) ---
   alGuardarProducto(producto: ProductoAdmin): void {
+    // Almacenamiento local temporal para mantener compatibilidad en productos
     const indice = this.listaProductos.findIndex(p => p.id === producto.id);
     if (indice !== -1) {
       this.listaProductos[indice] = { ...producto };
@@ -212,33 +266,55 @@ export class AdministradorComponent implements OnInit {
 
   // --- CONTROL DE INVENTARIO (Hijo -> Padre) ---
   alReabastecerIngrediente(ingredienteId: number): void {
-    const ingrediente = this.listaIngredientes.find(i => i.id === ingredienteId);
-    if (ingrediente) {
-      ingrediente.stockActual += 10;
-      this.mostrarAlertaExito(`Se añadieron 10 ${ingrediente.unidad} de ${ingrediente.nombre}.`);
-    }
+    this.inventarioService.reabastecerIngrediente(ingredienteId, 10).subscribe({
+      next: (exito) => {
+        if (exito) {
+          const ingrediente = this.listaIngredientes.find(i => i.id === ingredienteId);
+          if (ingrediente) {
+            ingrediente.stockActual += 10;
+            this.mostrarAlertaExito(`Se añadieron 10 ${ingrediente.unidad} de ${ingrediente.nombre}.`);
+          }
+        }
+      },
+      error: () => this.mostrarAlertaError('No se pudo reabastecer el inventario en el backend.')
+    });
   }
 
   // --- CONTROL DE EMPLEADOS (Hijo -> Padre) ---
   alGuardarEmpleado(empleado: EmpleadoAdmin): void {
     const indice = this.listaEmpleados.findIndex(e => e.id === empleado.id);
     if (indice !== -1) {
-      this.listaEmpleados[indice] = { ...empleado };
-      this.mostrarAlertaExito('Datos del empleado actualizados de forma exitosa.');
+      this.empleadoService.actualizarEmpleado(empleado).subscribe({
+        next: (exito) => {
+          if (exito) {
+            this.listaEmpleados[indice] = { ...empleado };
+            this.mostrarAlertaExito('Datos del empleado actualizados de forma exitosa.');
+          }
+        },
+        error: () => this.mostrarAlertaError('Error al actualizar datos en el backend.')
+      });
     } else {
-      const nuevoId = this.listaEmpleados.length > 0 ? Math.max(...this.listaEmpleados.map(e => e.id)) + 1 : 1;
-      empleado.id = nuevoId;
-      this.listaEmpleados.push({ ...empleado });
-      this.mostrarAlertaExito('Nuevo empleado registrado correctamente.');
+      this.empleadoService.crearEmpleado(empleado).subscribe({
+        next: (nuevo) => {
+          this.listaEmpleados.push(nuevo);
+          this.mostrarAlertaExito('Nuevo empleado registrado correctamente.');
+        },
+        error: () => this.mostrarAlertaError('Error al registrar nuevo empleado.')
+      });
     }
   }
 
   alConmutarEstadoEmpleado(empleadoId: number): void {
-    const empleado = this.listaEmpleados.find(e => e.id === empleadoId);
-    if (empleado) {
-      empleado.estado = empleado.estado === 'Activo' ? 'Inactivo' : 'Activo';
-      this.mostrarAlertaExito(`Estado de ${empleado.nombre} modificado a ${empleado.estado}.`);
-    }
+    this.empleadoService.conmutarEstado(empleadoId).subscribe({
+      next: (nuevoEstado) => {
+        const empleado = this.listaEmpleados.find(e => e.id === empleadoId);
+        if (empleado) {
+          empleado.estado = nuevoEstado as any;
+          this.mostrarAlertaExito(`Estado de ${empleado.nombre} modificado a ${empleado.estado}.`);
+        }
+      },
+      error: () => this.mostrarAlertaError('Error al conmutar estado de empleado en el backend.')
+    });
   }
 
   // --- CONTROL DE FACTURACIÓN (Hijo -> Padre) ---
@@ -260,27 +336,46 @@ export class AdministradorComponent implements OnInit {
   alEmitirFactura(datos: { rfc: string, razonSocial: string, usoCfdi: string }): void {
     if (!this.pedidoParaFacturar) return;
 
-    const folio = 'FAC-' + Math.floor(1000 + Math.random() * 9000);
-    this.listaFacturas.unshift({
-      id: folio,
-      fechaHora: new Date().toLocaleString('es-MX', { hour12: false }).substring(0, 17),
+    const payload = {
       pedidoId: this.pedidoParaFacturar.id,
       rfc: datos.rfc,
       razonSocial: datos.razonSocial,
       usoCfdi: datos.usoCfdi,
-      total: this.pedidoParaFacturar.total,
-      estado: 'Emitida'
+      total: this.pedidoParaFacturar.total
+    };
+
+    this.facturaService.emitirFactura(payload).subscribe({
+      next: (folio) => {
+        this.listaFacturas.unshift({
+          id: folio,
+          fechaHora: new Date().toLocaleString('es-MX', { hour12: false }).substring(0, 17),
+          pedidoId: this.pedidoParaFacturar!.id,
+          rfc: datos.rfc,
+          razonSocial: datos.razonSocial,
+          usoCfdi: datos.usoCfdi,
+          total: this.pedidoParaFacturar!.total,
+          estado: 'Emitida'
+        });
+        this.mostrarAlertaExito(`Factura ${folio} emitida.`);
+        this.pedidoParaFacturar = null;
+      },
+      error: (err) => this.mostrarAlertaError(err.error?.mensaje || 'Error al emitir factura en el backend.')
     });
-    this.mostrarAlertaExito(`Factura ${folio} emitida.`);
-    this.pedidoParaFacturar = null;
   }
 
   alCancelarFactura(facturaId: string): void {
-    const factura = this.listaFacturas.find(f => f.id === facturaId);
-    if (factura) {
-      factura.estado = 'Cancelada';
-      this.mostrarAlertaExito(`Factura ${facturaId} cancelada exitosamente.`);
-    }
+    this.facturaService.cancelarFactura(facturaId).subscribe({
+      next: (exito) => {
+        if (exito) {
+          const factura = this.listaFacturas.find(f => f.id === facturaId);
+          if (factura) {
+            factura.estado = 'Cancelada';
+            this.mostrarAlertaExito(`Factura ${facturaId} cancelada exitosamente.`);
+          }
+        }
+      },
+      error: () => this.mostrarAlertaError('Error al cancelar factura en el backend.')
+    });
   }
 
   alCancelarSeleccionFactura(): void {

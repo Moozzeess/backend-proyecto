@@ -1,5 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { ItemCarrito } from '../models/carrito.model';
 import { AutenticacionService } from './autenticacion.service';
 import { CORTES_CAJA_MOCK, FACTURAS_MOCK } from '../models/datos-simulados';
@@ -146,10 +148,15 @@ export class PedidoService {
       idCliente,
       idSucursal: 1, // Sucursal por defecto
       total: totalCalc,
+      metodoEntrega,
+      direccion,
+      telefono,
+      metodoPago,
       productos: productos.map(item => ({
         idProducto: item.producto.id,
         cantidad: item.cantidad,
-        precioUnitario: item.producto.precio
+        precioUnitario: item.producto.precio,
+        nombre: item.producto.nombre
       }))
     };
 
@@ -228,5 +235,96 @@ export class PedidoService {
 
   limpiarPedidoActivo(): void {
     this.pedidoActivo.set(null);
+  }
+
+  /**
+   * Reenvía el correo de confirmación de un pedido.
+   * Intención: Solicitar al backend volver a enviar el correo en caso de fallo anterior.
+   * Parámetros:
+   *   - idPedido (string): ID del pedido.
+   * Retorno: Observable<boolean> - Emite true si se reenvió, false si falló.
+   */
+  reenviarCorreoPedido(idPedido: string): Observable<boolean> {
+    const cleanId = idPedido.replace('#', '');
+    return this.http.post<{ exito: boolean }>(`${this.apiHost}/${cleanId}/reenviar-correo`, {})
+      .pipe(
+        map(res => res.exito),
+        catchError(() => of(false))
+      );
+  }
+
+  /**
+   * Consulta las estadísticas de ventas semanales del negocio desde el backend real.
+   * Intención: Alimentar las estadísticas de la gráfica de ventas del administrador.
+   * Retorno: Observable<Array<{ etiqueta: string; valor: number }>> - Lista de rendimiento.
+   */
+  obtenerEstadisticasVentas(): Observable<Array<{ etiqueta: string; valor: number }>> {
+    return this.http.get<{ exito: boolean; datos: Array<{ etiqueta: string; valor: number }> }>(`${this.apiHost}/estadisticas/ventas`).pipe(
+      map(res => res.datos)
+    );
+  }
+
+  /**
+   * Consulta la cantidad total vendida de cada pizza o artículo del menú.
+   * Intención: Proveer los datos reales para el reporte de los artículos más vendidos.
+   * Retorno: Observable<Array<{ etiqueta: string; valor: number }>> - Lista de popularidad de productos.
+   */
+  obtenerEstadisticasProductos(): Observable<Array<{ etiqueta: string; valor: number }>> {
+    return this.http.get<{ exito: boolean; datos: Array<{ etiqueta: string; valor: number }> }>(`${this.apiHost}/estadisticas/productos`).pipe(
+      map(res => res.datos)
+    );
+  }
+
+  /**
+   * Consulta los KPIs financieros diarios (Ventas de hoy, número de pedidos de hoy, clientes activos, ticket promedio) desde el backend real.
+   * Intención: Mostrar la información real actualizada en el Dashboard del administrador.
+   * Retorno: Observable<{ ventasHoy: number; pedidosHoy: number; clientesActivos: number; ticketPromedio: number }> - KPIs financieros.
+   */
+  obtenerKpisDiarios(): Observable<{ ventasHoy: number; pedidosHoy: number; clientesActivos: number; ticketPromedio: number }> {
+    return this.http.get<{ exito: boolean; datos: { ventasHoy: number; pedidosHoy: number; clientesActivos: number; ticketPromedio: number } }>(`${this.apiHost}/kpis`).pipe(
+      map(res => res.datos)
+    );
+  }
+
+  /**
+   * Consulta todos los cortes de caja del personal cajero.
+   */
+  obtenerCortesCaja(): Observable<CorteCaja[]> {
+    return this.http.get<{ exito: boolean; datos: CorteCaja[] }>('http://localhost:3000/api/cortes').pipe(
+      map(res => {
+        if (res.exito) {
+          this.cortesCaja.set(res.datos);
+        }
+        return res.datos;
+      })
+    );
+  }
+
+  /**
+   * Aprueba o cambia el estado de un corte de caja en el backend real.
+   */
+  aprobarCorteCaja(idCorte: string, estado: string = 'Aprobado'): Observable<boolean> {
+    return this.http.patch<{ exito: boolean }>('http://localhost:3000/api/cortes/' + encodeURIComponent(idCorte) + '/aprobar', { estado }).pipe(
+      map(res => res.exito)
+    );
+  }
+
+  /**
+   * Obtiene todos los pedidos registrados en el sistema en tiempo real.
+   */
+  obtenerTodos(): Observable<PedidoHistorico[]> {
+    return this.http.get<{ exito: boolean; datos: PedidoHistorico[] }>(this.apiHost).pipe(
+      map(res => res.datos)
+    );
+  }
+
+  /**
+   * Actualiza el estado de un pedido en la base de datos real.
+   */
+  actualizarEstadoPedido(idPedido: string, estado: string): Observable<boolean> {
+    const cleanId = idPedido.replace('#', '');
+    return this.http.patch<{ exito: boolean }>(`${this.apiHost}/${cleanId}/estado`, { estado }).pipe(
+      map(res => res.exito)
+    );
   }
 }

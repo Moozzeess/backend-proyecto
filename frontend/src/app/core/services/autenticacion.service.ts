@@ -60,11 +60,12 @@ export class AutenticacionService {
             id: datos.id,
             nombre: `${datos.nombre || ''} ${datos.apellido || ''}`.trim() || datos.correo,
             correo: datos.correo,
-            rol: rolFront
+            rol: rolFront,
+            puesto: datos.puesto
           };
 
           this.usuarioActual.set(usuario);
-          this.idClienteActual.set(datos.idCliente || null);
+          this.idClienteActual.set(datos.idCliente || datos.idEmpleado || null);
           return true;
         }
         return false;
@@ -77,27 +78,26 @@ export class AutenticacionService {
    * Registra un nuevo usuario con rol de cliente en la base de datos MySQL real.
    * Intención: Insertar credenciales de usuario y datos de perfil de cliente en el sistema.
    * Parámetros:
-   *   - nombre (string): Nombre.
+   *   - nombre (string): Nombre del cliente.
+   *   - apellido (string): Apellido del cliente.
    *   - correo (string): Dirección de correo electrónico.
    *   - contrasenia (string): Contraseña elegida.
+   *   - telefono (string): Teléfono del cliente.
    * Retorno: Observable<boolean> - true si el registro fue exitoso, false si falló.
+   * Casos límite (edge cases):
+   *   - Si alguno de los parámetros obligatorios está vacío, retorna un Observable que emite false.
    */
-  registrar(nombre: string, correo: string, contrasenia: string): Observable<boolean> {
-    if (!nombre || !correo || !contrasenia) {
+  registrar(nombre: string, apellido: string, correo: string, contrasenia: string, telefono: string): Observable<boolean> {
+    if (!nombre || !apellido || !correo || !contrasenia || !telefono) {
       return of(false);
     }
 
-    // Para fines del registro de Cliente, dividimos el nombre en nombre y apellido de prueba
-    const partesNombre = nombre.trim().split(' ');
-    const primerNombre = partesNombre[0];
-    const apellido = partesNombre.slice(1).join(' ') || 'López'; // Apellido por defecto para la base de datos
-
     return this.http.post<{ exito: boolean; datos: any }>(`${this.apiHost}/registro`, {
-      nombre: primerNombre,
-      apellido: apellido,
+      nombre: nombre.trim(),
+      apellido: apellido.trim(),
       correo: correo.trim().toLowerCase(),
       contrasena: contrasenia.trim(),
-      telefono: '55' + Math.floor(10000000 + Math.random() * 90000000).toString(), // Generación de teléfono ficticio para la tabla Cliente
+      telefono: telefono.trim(),
       direccion: ''
     }).pipe(
       map(respuesta => respuesta.exito),

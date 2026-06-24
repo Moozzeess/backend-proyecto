@@ -10,30 +10,47 @@
             </p>
 
             <nav class="mt-12 space-y-3">
-                <a (click)="cambiarSeccion('pedidos')" 
+                <!-- Cajero General / Administrador de Sucursal -->
+                <a *ngIf="puestoEmpleado === 'Cajero General' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('pedidos')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'pedidos', 'hover:bg-white/10': seccionActiva !== 'pedidos'}">
                     Pedidos Kanban
                 </a>
 
-                <a (click)="cambiarSeccion('cocina')" 
+                <!-- Ventas en Sucursal (Cajero) -->
+                <a *ngIf="puestoEmpleado === 'Cajero General' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('ventassucursal')" 
+                   class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
+                   [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'ventassucursal', 'hover:bg-white/10': seccionActiva !== 'ventassucursal'}">
+                    Ventas Mostrador
+                </a>
+
+                <!-- Chef Pizzero / Administrador de Sucursal -->
+                <a *ngIf="puestoEmpleado === 'Chef Pizzero' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('cocina')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'cocina', 'hover:bg-white/10': seccionActiva !== 'cocina'}">
                     Cocina y Armado
                 </a>
 
-                <a (click)="cambiarSeccion('entregas')" 
+                <!-- Repartidor Motociclista / Administrador de Sucursal -->
+                <a *ngIf="puestoEmpleado === 'Repartidor Motociclista' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('entregas')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'entregas', 'hover:bg-white/10': seccionActiva !== 'entregas'}">
                     Despacho Envíos
                 </a>
 
-                <a (click)="cambiarSeccion('inventario')" 
+                <!-- Chef Pizzero / Administrador de Sucursal (Inventario) -->
+                <a *ngIf="puestoEmpleado === 'Chef Pizzero' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('inventario')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'inventario', 'hover:bg-white/10': seccionActiva !== 'inventario'}">
                     Almacén Insumos
                 </a>
 
+                <!-- Común a todos: Alertas -->
                 <a (click)="cambiarSeccion('notificaciones')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all relative"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'notificaciones', 'hover:bg-white/10': seccionActiva !== 'notificaciones'}">
@@ -43,13 +60,17 @@
                     </span>
                 </a>
 
-                <a (click)="cambiarSeccion('corte')" 
+                <!-- Cajero General / Administrador de Sucursal -->
+                <a *ngIf="puestoEmpleado === 'Cajero General' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('corte')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'corte', 'hover:bg-white/10': seccionActiva !== 'corte'}">
                     Corte de Caja
                 </a>
 
-                <a (click)="cambiarSeccion('facturacion')" 
+                <!-- Cajero General / Administrador de Sucursal -->
+                <a *ngIf="puestoEmpleado === 'Cajero General' || puestoEmpleado === 'Administrador de Sucursal'"
+                   (click)="cambiarSeccion('facturacion')" 
                    class="block p-4 rounded-xl font-bold cursor-pointer transition-all"
                    [ngClass]="{'bg-white/20 shadow-md': seccionActiva === 'facturacion', 'hover:bg-white/10': seccionActiva !== 'facturacion'}">
                     Facturación CFDI
@@ -90,10 +111,10 @@
                 <div class="flex items-center gap-3">
                     <div class="text-right">
                         <span class="font-bold text-gray-800 block text-sm">{{ nombreEmpleado }}</span>
-                        <span class="text-xs text-gray-400 font-semibold block">Chef Principal</span>
+                        <span class="text-xs text-gray-400 font-semibold block">{{ puestoEmpleado }}</span>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-[#f6d76b] flex items-center justify-center font-extrabold text-gray-800 text-lg shadow-sm border border-[#f6d76b]/30">
-                        C
+                        {{ nombreEmpleado.charAt(0).toUpperCase() }}
                     </div>
                 </div>
             </div>
@@ -104,8 +125,14 @@
             <!-- TABLERO KANBAN -->
             <app-tablero-kanban *ngIf="seccionActiva === 'pedidos'" 
                                 [pedidos]="listaPedidos" 
-                                (cambioEstado)="alCambiarEstadoPedido($event)">
+                                (cambioEstado)="alCambiarEstadoPedido($event)"
+                                (solicitarRegistroSucursal)="cambiarSeccion('ventassucursal')">
             </app-tablero-kanban>
+
+            <!-- VENTAS MOSTRADOR SUCURSAL -->
+            <app-vista-ventas-sucursal *ngIf="seccionActiva === 'ventassucursal'"
+                                       (pedidoCreado)="cargarDatosReales(); cambiarSeccion('pedidos')">
+            </app-vista-ventas-sucursal>
 
             <!-- VISTA COCINA -->
             <app-vista-cocina *ngIf="seccionActiva === 'cocina'" 

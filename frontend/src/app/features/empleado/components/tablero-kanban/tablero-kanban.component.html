@@ -5,9 +5,19 @@
             <h3 class="font-bold text-xl text-gray-800">
                 Nuevos
             </h3>
-            <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                {{ filtrarPedidos('Nuevo').length }}
-            </span>
+            <div class="flex items-center gap-2">
+                <button (click)="solicitarRegistroSucursal.emit()" 
+                        class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-lg hover:bg-blue-700 transition-colors border-none cursor-pointer flex items-center gap-1 shadow-sm"
+                        title="Registrar Pedido Físico en Sucursal">
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    + Sucursal
+                </button>
+                <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                    {{ filtrarPedidos('Nuevo').length }}
+                </span>
+            </div>
         </div>
 
         <div class="space-y-4">

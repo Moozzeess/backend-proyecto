@@ -309,7 +309,7 @@
                                 <th class="py-2.5">RFC</th>
                                 <th class="py-2.5">Monto</th>
                                 <th class="py-2.5">Estatus</th>
-                                <th class="py-2.5 text-right" *ngIf="rolActivo === 'admin'">Acciones</th>
+                                <th class="py-2.5 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -326,12 +326,22 @@
                                         {{ fac.estado }}
                                     </span>
                                 </td>
-                                <td class="py-3 text-right" *ngIf="rolActivo === 'admin'">
-                                    <button *ngIf="fac.estado === 'Emitida'" 
-                                            (click)="cancelarFactura(fac.id)"
-                                            class="px-2.5 py-1 bg-red-50 text-red-600 font-bold rounded-md text-[10px] hover:bg-red-100 transition-colors cursor-pointer">
-                                        Cancelar
-                                    </button>
+                                <td class="py-3 text-right">
+                                    <div class="flex justify-end gap-1.5 items-center">
+                                        <button (click)="descargarFacturaPDF(fac)"
+                                                class="px-2 py-1 bg-blue-50 text-blue-600 font-bold rounded-md text-[9px] hover:bg-blue-100 transition-colors cursor-pointer">
+                                            PDF
+                                        </button>
+                                        <button (click)="descargarFacturaXML(fac)"
+                                                class="px-2 py-1 bg-green-50 text-green-600 font-bold rounded-md text-[9px] hover:bg-green-100 transition-colors cursor-pointer">
+                                            XML
+                                        </button>
+                                        <button *ngIf="fac.estado === 'Emitida' && rolActivo === 'admin'" 
+                                                (click)="cancelarFactura(fac.id)"
+                                                class="px-2 py-1 bg-red-50 text-red-600 font-bold rounded-md text-[9px] hover:bg-red-100 transition-colors cursor-pointer">
+                                            Cancelar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

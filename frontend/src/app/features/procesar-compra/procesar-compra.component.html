@@ -83,6 +83,50 @@
                                     (ngModelChange)="referencia.set($event)" placeholder="ej. Portón azul frente al parque"
                                     class="input-campo" id="input-checkout-referencia">
                             </div>
+                            
+                            <!-- Controles e Integración de Mapa (Google Maps + Simulador) -->
+                            <div class="sm:col-span-3 space-y-3 mt-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="block text-sm font-bold text-gray-700">Ubicar en el Mapa para mayor precisión</label>
+                                    <button type="button" (click)="geolocalizarUsuario()" 
+                                        class="text-xs bg-[#ff9036] hover:bg-[#ff5475] text-white px-3 py-1.5 rounded-full font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                        </svg>
+                                        Usar ubicación actual
+                                    </button>
+                                </div>
+                                
+                                <!-- Google Maps Real (Ocultado inteligentemente si falla o no hay internet/key) -->
+                                <div [hidden]="usarMapaSimulado()" id="mapa-pedido" class="h-64 w-full rounded-2xl shadow-inner border border-gray-200 overflow-hidden"></div>
+                                
+                                <!-- Mapa Simulador Fallback si no carga Google Maps -->
+                                <div *ngIf="usarMapaSimulado()" class="relative h-64 w-full rounded-2xl shadow-inner border border-dashed border-[#ff9036]/50 bg-gradient-to-br from-[#fdeba9]/20 to-[#ff9036]/5 p-4 flex flex-col justify-between overflow-hidden">
+                                    <div class="z-10 text-center max-w-sm mx-auto bg-white/80 backdrop-blur-md p-3 rounded-xl border border-gray-100 shadow-sm">
+                                        <p class="text-xs font-bold text-gray-800">Simulador de Mapa (Sin API Key de Google)</p>
+                                        <p class="text-[11px] text-gray-500 mt-1">Haz clic en alguna de las zonas rápidas para simular la localización y autocompletar:</p>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-3 gap-2 z-10">
+                                        <button type="button" (click)="seleccionarUbicacionSimulada('centro')" class="bg-white hover:bg-[#fdeba9] border border-gray-200 rounded-xl py-2 px-1 text-xs font-bold text-gray-700 shadow-sm transition-all cursor-pointer hover:scale-[1.02]">
+                                            Centro Histórico
+                                        </button>
+                                        <button type="button" (click)="seleccionarUbicacionSimulada('roma')" class="bg-white hover:bg-[#fdeba9] border border-gray-200 rounded-xl py-2 px-1 text-xs font-bold text-gray-700 shadow-sm transition-all cursor-pointer hover:scale-[1.02]">
+                                            Roma Norte
+                                        </button>
+                                        <button type="button" (click)="seleccionarUbicacionSimulada('polanco')" class="bg-white hover:bg-[#fdeba9] border border-gray-200 rounded-xl py-2 px-1 text-xs font-bold text-gray-700 shadow-sm transition-all cursor-pointer hover:scale-[1.02]">
+                                            Polanco
+                                        </button>
+                                    </div>
+
+                                    <!-- Animación de radar pulsante de fondo -->
+                                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                                        <span class="w-36 h-36 rounded-full bg-[#ff9036] animate-ping absolute"></span>
+                                        <span class="w-16 h-16 rounded-full bg-[#d6254d] absolute"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Información si es recoger en sucursal -->

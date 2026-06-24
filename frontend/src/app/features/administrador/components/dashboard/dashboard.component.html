@@ -8,7 +8,7 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="card p-6 border-l-4 border-[#d6254d]">
             <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Ventas Hoy</p>
-            <h3 class="text-3xl font-black mt-2 text-gray-800">${{ ventasHoyPesos | number }}</h3>
+            <h3 class="text-3xl font-black mt-2 text-gray-800">${{ ventasHoyPesos | number:'1.2-2' }}</h3>
         </div>
 
         <div class="card p-6 border-l-4 border-[#ff9036]">
@@ -18,12 +18,12 @@
 
         <div class="card p-6 border-l-4 border-[#ff5475]">
             <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Clientes Activos</p>
-            <h3 class="text-3xl font-black mt-2 text-gray-800">2,847</h3>
+            <h3 class="text-3xl font-black mt-2 text-gray-800">{{ clientesActivos | number }}</h3>
         </div>
 
         <div class="card p-6 border-l-4 border-[#f6d76b]">
             <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Ticket Promedio</p>
-            <h3 class="text-3xl font-black mt-2 text-gray-800">$141</h3>
+            <h3 class="text-3xl font-black mt-2 text-gray-800">${{ ticketPromedio | number:'1.2-2' }}</h3>
         </div>
     </div>
 
@@ -31,24 +31,19 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2">
             <app-grafica [titulo]="'Ventas Semanales'" 
-                         [datos]="[{etiqueta:'Lun',valor:28400},{etiqueta:'Mar',valor:31200},{etiqueta:'Mie',valor:29500},{etiqueta:'Jue',valor:38700},{etiqueta:'Vie',valor:48920},{etiqueta:'Sab',valor:55400},{etiqueta:'Dom',valor:58100}]" 
+                         [datos]="datosGraficaSemanales" 
                          [esMoneda]="true"></app-grafica>
         </div>
 
         <div class="card p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-6">Productos Más Vendidos</h3>
             <div class="space-y-4">
-                <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                    <span class="text-sm font-semibold text-gray-600">Pepperoni Supreme</span>
-                    <span class="px-3 py-1 bg-red-50 text-[#d6254d] text-xs font-bold rounded-full">432 uds</span>
+                <div *ngFor="let prod of productosMasVendidos" class="flex justify-between items-center pb-2 border-b border-gray-100">
+                    <span class="text-sm font-semibold text-gray-600">{{ prod.etiqueta }}</span>
+                    <span class="px-3 py-1 bg-red-50 text-[#d6254d] text-xs font-bold rounded-full">{{ prod.valor }} uds</span>
                 </div>
-                <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                    <span class="text-sm font-semibold text-gray-600">Hawaiana Real</span>
-                    <span class="px-3 py-1 bg-red-50 text-[#d6254d] text-xs font-bold rounded-full">398 uds</span>
-                </div>
-                <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                    <span class="text-sm font-semibold text-gray-600">Mexicana Premium</span>
-                    <span class="px-3 py-1 bg-red-50 text-[#d6254d] text-xs font-bold rounded-full">366 uds</span>
+                <div *ngIf="productosMasVendidos.length === 0" class="text-sm text-gray-400 py-4 text-center">
+                    Sin ventas registradas
                 </div>
             </div>
         </div>

@@ -9,6 +9,9 @@ import { CarritoService } from '../../core/services/carrito.service';
 import { PedidoService, PedidoHistorico } from '../../core/services/pedido.service';
 import { ProductosService } from '../../core/services/productos.service';
 
+import { GeneradorDocumentosService } from '../../core/services/generador-documentos.service';
+import { AlertasService } from '../../core/services/alertas.service';
+
 /**
  * Componente: ClienteComponent
  * Intención: Representa el panel principal para el rol de Cliente. Permite explorar el menú de productos,
@@ -65,13 +68,16 @@ export class ClienteComponent implements OnInit, OnDestroy {
    *   - carritoService (CarritoService): Servicio del carrito de compras.
    *   - pedidoService (PedidoService): Servicio para la gestión de pedidos activos.
    *   - productosService (ProductosService): Servicio para consultar productos del backend.
+   *   - generadorDocumentos (GeneradorDocumentosService): Servicio para exportar PDF/XML.
    */
   constructor(
     private router: Router,
     public autenticacionService: AutenticacionService,
     private carritoService: CarritoService,
     private pedidoService: PedidoService,
-    private productosService: ProductosService
+    private productosService: ProductosService,
+    private generadorDocumentos: GeneradorDocumentosService,
+    private alertasService: AlertasService
   ) {}
 
   /**
@@ -358,5 +364,42 @@ export class ClienteComponent implements OnInit, OnDestroy {
    */
   deseleccionarPedido(): void {
     this.pedidoSeleccionado.set(null);
+  }
+
+  /**
+   * Intención: Descargar comprobante PDF del pedido seleccionado.
+   * Parámetros:
+   *   - pedido (any): Datos consolidadores del pedido.
+   * Retorno: void.
+   */
+  descargarPedidoPDF(pedido: any): void {
+    this.generadorDocumentos.descargarPedidoPDF(pedido);
+  }
+
+  /**
+   * Intención: Descargar comprobante XML del pedido seleccionado.
+   * Parámetros:
+   *   - pedido (any): Datos consolidadores del pedido.
+   * Retorno: void.
+   */
+  descargarPedidoXML(pedido: any): void {
+    this.generadorDocumentos.descargarPedidoXML(pedido);
+  }
+
+  /**
+   * Intención: Solicitar el reenvío del correo de confirmación de un pedido.
+   * Parámetros:
+   *   - pedido (any): El pedido del cual se reenviará el correo.
+   * Retorno: void.
+   */
+  reenviarCorreoPedido(pedido: any): void {
+    if (!pedido) return;
+    this.pedidoService.reenviarCorreoPedido(pedido.id).subscribe(exito => {
+      if (exito) {
+        this.alertasService.lanzarNotificacion(`¡Correo de confirmación reenviado con éxito para el pedido ${pedido.id}!`, 'aceptado');
+      } else {
+        this.alertasService.lanzarNotificacion(`No se pudo enviar el correo del pedido ${pedido.id}. Por favor, intenta de nuevo.`, 'error');
+      }
+    });
   }
 }

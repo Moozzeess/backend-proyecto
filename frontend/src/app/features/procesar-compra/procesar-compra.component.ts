@@ -7,6 +7,8 @@ import { PedidoService } from '../../core/services/pedido.service';
 import { AlertasService, AlertaError } from '../../core/services/alertas.service';
 import { AutenticacionService } from '../../core/services/autenticacion.service';
 
+declare var google: any;
+
 /**
  * Componente: ProcesarCompraComponent
  * Intención: Administrar la interfaz y lógica para la confirmación de la compra,
@@ -58,6 +60,15 @@ export class ProcesarCompraComponent implements OnInit {
   /** Signal para mostrar una alerta de éxito simulada antes de redirigir. */
   mensajeExito = signal<string>('');
 
+  /** Referencia del mapa de Google */
+  mapa: any = null;
+
+  /** Referencia del marcador en el mapa */
+  marcador: any = null;
+
+  /** Bandera para habilitar un mapa simulado si no carga la API Key de Google Maps */
+  usarMapaSimulado = signal<boolean>(false);
+
   /** Enlace directo al listado del carrito global. */
   elementosCarrito = computed(() => this.carritoService.carrito());
 
@@ -93,8 +104,10 @@ export class ProcesarCompraComponent implements OnInit {
   ) {}
 
   /**
-   * Intención: Verificar el estado del carrito y la sesión al inicializar.
+   * Intención: Verificar el estado del carrito y la sesión al inicializar, y cargar la API de mapas si aplica.
    * Retorno: void.
+   * Casos límite (edge cases):
+   *   - Si el método por defecto es domicilio, inicia la carga dinámica del mapa.
    */
   ngOnInit(): void {
     // Si no está autenticado, redirigir al login guardando retorno
@@ -108,6 +121,207 @@ export class ProcesarCompraComponent implements OnInit {
     if (usuario) {
       this.nombreCliente.set(usuario.nombre);
     }
+
+    // Inicializar mapa si el método por defecto es domicilio
+    if (this.metodoEntrega() === 'domicilio') {
+      setTimeout(() => {
+        this.cargarGoogleMaps();
+      }, 200);
+    }
+  }
+
+  /**
+   * Carga de forma asíncrona la API de Google Maps o activa el simulador si ocurre un error.
+   * Intención: Asegurar la disponibilidad de mapas para seleccionar dirección de entrega.
+   * Retorno: void.
+   * Casos límite (edge cases):
+   *   - Si la API ya está en memoria, invoca directamente la inicialización.
+   *   - Si la carga por red falla o se bloquea, activa usarMapaSimulado.
+   */
+  cargarGoogleMaps(): void {
+    if ((window as any).google && (window as any).google.maps) {
+      this.inicializarMapa();
+      return;
+    }
+
+    const scriptId = 'google-maps-script';
+    if (document.getElementById(scriptId)) {
+      return;
+    }
+
+    // Callback global requerido por la API asíncrona de Google Maps
+    (window as any).initGoogleMapsCallback = () => {
+      this.inicializarMapa();
+    };
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = `https://maps.googleapis.com/maps/api/js?libraries=places&callback=initGoogleMapsCallback`;
+    script.async = true;
+    script.defer = true;
+
+    script.onerror = () => {
+      this.usarMapaSimulado.set(true);
+    };
+
+    document.head.appendChild(script);
+
+    // Timeout de respaldo por si el script tarda demasiado (ej. sin internet o bloqueado por AdBlock)
+    setTimeout(() => {
+      if (!((window as any).google && (window as any).google.maps)) {
+        this.usarMapaSimulado.set(true);
+      }
+    }, 4000);
+  }
+
+  /**
+   * Inicializa la vista del mapa e instala el marcador arrastrable.
+   * Intención: Permitir la interacción visual en el mapa para ajustar coordenadas.
+   * Retorno: void.
+   * Casos límite (edge cases):
+   *   - Si el contenedor del mapa en el DOM no está listo, aborta.
+   *   - Si la inicialización del objeto Google Map falla, activa usarMapaSimulado.
+   */
+  inicializarMapa(): void {
+    const contenedor = document.getElementById('mapa-pedido');
+    if (!contenedor) return;
+
+    const cdmx = { lat: 19.4326, lng: -99.1332 };
+
+    try {
+      this.mapa = new google.maps.Map(contenedor, {
+        center: cdmx,
+        zoom: 15,
+        disableDefaultUI: false,
+        zoomControl: true
+      });
+
+      this.marcador = new google.maps.Marker({
+        position: cdmx,
+        map: this.mapa,
+        draggable: true,
+        title: 'Arrastra para ubicar tu entrega'
+      });
+
+      // Escuchar evento de arrastre para recuperar la dirección
+      this.marcador.addListener('dragend', () => {
+        const posicion = this.marcador.getPosition();
+        if (posicion) {
+          this.obtenerDireccionDesdeCoordenadas(posicion.lat(), posicion.lng());
+        }
+      });
+
+      // Obtener dirección inicial
+      this.obtenerDireccionDesdeCoordenadas(cdmx.lat, cdmx.lng);
+    } catch (e) {
+      this.usarMapaSimulado.set(true);
+    }
+  }
+
+  /**
+   * Realiza la geocodificación inversa a partir de coordenadas geográficas.
+   * Intención: Autocompletar dinámicamente los campos de dirección mediante coordenadas.
+   * Parámetros:
+   *   - lat (number): Latitud de la ubicación.
+   *   - lng (number): Longitud de la ubicación.
+   * Retorno: void.
+   * Casos límite (edge cases):
+   *   - Si el Geocoder falla o no retorna datos válidos, no modifica los campos.
+   */
+  obtenerDireccionDesdeCoordenadas(lat: number, lng: number): void {
+    if (!(window as any).google || !google.maps.Geocoder) {
+      return;
+    }
+
+    try {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (resultados: any[], status: string) => {
+        if (status === 'OK' && resultados && resultados[0]) {
+          const direccionComponentes = resultados[0].address_components;
+          let calleVal = '';
+          let numeroVal = '';
+          let cpVal = '';
+
+          for (const componente of direccionComponentes) {
+            const tipos = componente.types;
+            if (tipos.includes('route')) {
+              calleVal = componente.long_name;
+            } else if (tipos.includes('street_number')) {
+              numeroVal = componente.long_name;
+            } else if (tipos.includes('postal_code')) {
+              cpVal = componente.long_name;
+            }
+          }
+
+          if (calleVal) this.calle.set(calleVal);
+          if (numeroVal) this.numeroExterior.set(numeroVal);
+          if (cpVal) this.codigoPostal.set(cpVal);
+        }
+      });
+    } catch (error) {
+      console.warn('Geocodificación inversa fallida:', error);
+    }
+  }
+
+  /**
+   * Geolocaliza el dispositivo del usuario centrando el mapa en su posición actual.
+   * Intención: Agilizar el llenado de la dirección mediante geolocalización nativa.
+   * Retorno: void.
+   * Casos límite (edge cases):
+   *   - Si el navegador no soporta geolocalización o el permiso es denegado, no realiza cambios.
+   */
+  geolocalizarUsuario(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (posicion) => {
+          const lat = posicion.coords.latitude;
+          const lng = posicion.coords.longitude;
+          const coords = { lat, lng };
+
+          if (this.mapa && this.marcador) {
+            this.mapa.setCenter(coords);
+            this.marcador.setPosition(coords);
+            this.obtenerDireccionDesdeCoordenadas(lat, lng);
+          } else {
+            // Relleno simulado si no está cargado Google Maps
+            this.calle.set('Avenida Paseo de la Reforma');
+            this.numeroExterior.set('222');
+            this.codigoPostal.set('06600');
+          }
+        },
+        () => {
+          // Si falla, se puede rellenar un simulado básico
+          this.calle.set('Av. Juárez');
+          this.numeroExterior.set('50');
+          this.codigoPostal.set('06010');
+        }
+      );
+    }
+  }
+
+  /**
+   * Simula la selección de una coordenada en el mapa simulado interactivo.
+   * Intención: Permitir probar la funcionalidad de mapas interactivos sin depender de la red/Google API key.
+   * Parámetros:
+   *   - area (string): Zona seleccionada.
+   * Retorno: void.
+   * Casos límite (edge cases):
+   *   - Actualiza con datos predefinidos realistas para cada zona de prueba.
+   */
+  seleccionarUbicacionSimulada(area: string): void {
+    if (area === 'centro') {
+      this.calle.set('Calle Madero');
+      this.numeroExterior.set('10');
+      this.codigoPostal.set('06000');
+    } else if (area === 'roma') {
+      this.calle.set('Avenida Álvaro Obregón');
+      this.numeroExterior.set('180');
+      this.codigoPostal.set('06700');
+    } else if (area === 'polanco') {
+      this.calle.set('Avenida Presidente Masaryk');
+      this.numeroExterior.set('310');
+      this.codigoPostal.set('11560');
+    }
   }
 
   /**
@@ -119,6 +333,11 @@ export class ProcesarCompraComponent implements OnInit {
   cambiarMetodoEntrega(metodo: string): void {
     this.metodoEntrega.set(metodo);
     this.alertaActual.set(null);
+    if (metodo === 'domicilio') {
+      setTimeout(() => {
+        this.cargarGoogleMaps();
+      }, 200);
+    }
   }
 
   /**

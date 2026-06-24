@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const UsuarioModelo = require('../modelos/usuario.modelo');
+const CorreoServicio = require('./correo.servicio');
 const { 
   encriptarCorreo, 
   encriptarTexto, 
@@ -87,6 +88,9 @@ class AutenticacionServicio {
       telefonoCifrado,
       direccionCifrada
     );
+
+    // Enviar correo de bienvenida de forma asíncrona en segundo plano
+    CorreoServicio.enviarCorreoBienvenida(correo, `${nombre} ${apellido}`.trim());
 
     // Desencriptar el correo antes de retornarlo
     resultado.correo = desencriptarCorreo(resultado.correo);

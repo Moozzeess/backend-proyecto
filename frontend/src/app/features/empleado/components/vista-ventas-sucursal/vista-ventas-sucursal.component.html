@@ -1,0 +1,180 @@
+<div class="mt-8">
+    <div class="mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">
+            Ventas en Sucursal (Mostrador)
+        </h3>
+        <p class="text-gray-500 text-sm mt-1">
+            Toma de pedidos presenciales de forma rápida y generación de tickets de consumo.
+        </p>
+    </div>
+
+    <!-- DISEÑO EN SPLIT-SCREEN TIPO TABLERO PROFESIONAL -->
+    <div class="grid lg:grid-cols-3 gap-8">
+        <!-- SECCIÓN IZQUIERDA Y CENTRAL: FILTROS Y TABLA DE PRODUCTOS (2/3 de pantalla) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- BARRA DE ACCIONES Y FILTROS -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <!-- Buscador de Platillos -->
+                <div class="relative flex-1">
+                    <input type="text"
+                           [(ngModel)]="filtroBusqueda"
+                           placeholder="Buscar producto por nombre..."
+                           class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#d6254d] text-gray-700 transition-colors" />
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+                </div>
+
+                <!-- Filtros de Categorías Rápidas -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                    <button *ngFor="let cat of ['todas', 'pizza', 'bebida', 'postre']"
+                            (click)="categoriaActiva = cat"
+                            class="px-4 py-2 rounded-xl text-xs font-bold transition-all border border-solid capitalize cursor-pointer"
+                            [ngClass]="{
+                                'bg-[#d6254d] text-white border-[#d6254d] shadow-sm': categoriaActiva === cat,
+                                'bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-300': categoriaActiva !== cat
+                            }">
+                        {{ cat === 'todas' ? 'Todos' : cat + 's' }}
+                    </button>
+                </div>
+
+                <!-- Ordenación -->
+                <div>
+                    <select [(ngModel)]="criterioOrden"
+                            class="p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-600 focus:outline-none cursor-pointer">
+                        <option value="nombre-asc">Nombre (A-Z)</option>
+                        <option value="precio-asc">Precio: Más Bajo</option>
+                        <option value="precio-desc">Precio: Más Alto</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TABLA DE SELECCIÓN DE PRODUCTOS -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/50 text-gray-400 text-xs font-bold uppercase border-b border-gray-100">
+                            <th class="p-4">Platillo / Consumible</th>
+                            <th class="p-4">Categoría</th>
+                            <th class="p-4 text-right">Precio Unitario</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <tr *ngFor="let prod of obtenerProductosFiltrados()"
+                            (click)="alternarProducto(prod)"
+                            class="hover:bg-blue-50/10 cursor-pointer transition-colors"
+                            [ngClass]="{'bg-[#fdeba9]/30 font-semibold': estaSeleccionado(prod)}">
+                            <td class="p-4 flex items-center gap-3">
+                                <!-- Checkbox visual -->
+                                <div class="w-5 h-5 rounded-lg border flex items-center justify-center transition-all"
+                                     [ngClass]="{
+                                         'bg-[#d6254d] border-[#d6254d] text-white': estaSeleccionado(prod),
+                                         'border-gray-200 bg-white': !estaSeleccionado(prod)
+                                     }">
+                                    <svg *ngIf="estaSeleccionado(prod)" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                
+                                <!-- Imagen real del producto del catálogo -->
+                                <img [src]="'/assets/imagenes/productos/' + prod.id + '.jpg'" 
+                                     onerror="this.src='/assets/imagenes/pizza-generica.jpg'"
+                                     class="w-12 h-12 rounded-xl object-cover shadow-sm border border-gray-100 bg-gray-50"
+                                     alt="Imagen del platillo" />
+
+                                <span class="text-sm text-gray-800 font-bold">{{ prod.nombre }}</span>
+                            </td>
+                            <td class="p-4 text-xs text-gray-400 capitalize">
+                                <span class="px-2 py-0.5 rounded-full font-bold"
+                                      [ngClass]="{
+                                          'bg-amber-50 text-amber-600': prod.categoria === 'pizza',
+                                          'bg-blue-50 text-blue-600': prod.categoria === 'bebida',
+                                          'bg-pink-50 text-pink-600': prod.categoria === 'postre'
+                                      }">
+                                    {{ prod.categoria }}
+                                </span>
+                            </td>
+                            <td class="p-4 text-right text-sm font-extrabold text-gray-800">
+                                ${{ prod.precio }}.00
+                            </td>
+                        </tr>
+                        <tr *ngIf="obtenerProductosFiltrados().length === 0">
+                            <td colspan="3" class="p-8 text-center text-gray-400">
+                                No se encontraron artículos que coincidan con la búsqueda.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DERECHA: RESUMEN Y DETALLE DEL TICKET FISCAL (1/3 de pantalla) -->
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between min-h-[500px]">
+                <div>
+                    <h4 class="text-lg font-bold text-gray-800 pb-3 border-b border-gray-100 mb-4 flex items-center justify-between">
+                        <span>Detalle del Ticket</span>
+                        <span class="text-xs bg-[#ff9036]/15 text-[#ff9036] px-2.5 py-1 rounded-full font-bold">
+                            {{ carritoLocal.length }} items
+                        </span>
+                    </h4>
+
+                    <!-- Detalle de Productos en Carrito -->
+                    <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        <div *ngIf="carritoLocal.length === 0" class="text-center py-12 text-gray-400 text-sm">
+                            Haga clic en los elementos de la tabla para agregarlos a la comanda.
+                        </div>
+                        
+                        <div *ngFor="let item of carritoLocal" class="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl border border-gray-100 transition-all">
+                            <div class="flex-1">
+                                <span class="text-xs font-bold text-gray-700 block">{{ item.producto.nombre }}</span>
+                                <span class="text-[11px] text-gray-400">${{ item.producto.precio }}.00 c/u</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button (click)="modificarCantidad(item.producto.id, -1)" class="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors border-none cursor-pointer font-bold text-xs flex items-center justify-center">-</button>
+                                <span class="text-xs font-bold text-gray-800 w-4 text-center">{{ item.cantidad }}</span>
+                                <button (click)="modificarCantidad(item.producto.id, 1)" class="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors border-none cursor-pointer font-bold text-xs flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos del Cliente / Comanda -->
+                    <div class="mt-6 space-y-4 pt-4 border-t border-gray-100">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Método de Pago</label>
+                            <select [(ngModel)]="metodoPago"
+                                    class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 font-bold focus:outline-none focus:border-[#d6254d] cursor-pointer">
+                                <option value="Efectivo">Efectivo en Caja</option>
+                                <option value="Tarjeta">Tarjeta de Crédito / Débito</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Teléfono Cliente (Opcional)</label>
+                            <input type="text"
+                                   [(ngModel)]="telefonoCliente"
+                                   placeholder="Ej. 5512345678"
+                                   class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 focus:outline-none focus:border-[#d6254d]" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Totales y Confirmación -->
+                <div class="mt-8 pt-4 border-t border-gray-100 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400 font-medium">Importe Total</span>
+                        <span class="text-2xl font-extrabold text-[#d6254d]">${{ obtenerTotalTicket() }}.00</span>
+                    </div>
+
+                    <button (click)="guardarPedido()"
+                            [disabled]="carritoLocal.length === 0"
+                            class="w-full py-3 bg-[#d6254d] hover:bg-[#ff5475] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all cursor-pointer border-none shadow-sm text-sm">
+                        Generar Ticket y Comanda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

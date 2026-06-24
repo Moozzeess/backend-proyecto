@@ -13,12 +13,32 @@ class UsuarioModelo {
    */
   static async buscarPorCorreo(correo) {
     const query = `
-      SELECT u.idUsuario AS id, u.correo, u.contrasena, u.rol, c.idCliente, c.nombre, c.apellido, c.telefono, c.direccion 
+      SELECT u.idUsuario AS id, u.correo, u.contrasena, u.rol, 
+             c.idCliente, COALESCE(c.nombre, e.nombre) AS nombre, COALESCE(c.apellido, e.apellido) AS apellido, 
+             c.telefono, c.direccion, e.puesto, e.idEmpleado
       FROM Usuario u
       LEFT JOIN Cliente c ON u.idUsuario = c.idUsuario
+      LEFT JOIN Empleado e ON u.idUsuario = e.idUsuario
       WHERE u.correo = ?
     `;
     const [filas] = await pool.query(query, [correo]);
+    return filas.length > 0 ? filas[0] : null;
+  }
+
+  /**
+   * Intención: Buscar el correo y datos básicos de un cliente por su idCliente único.
+   * Parámetros:
+   *   - idCliente (number): ID único del cliente.
+   * Retorno: Promise<Object|null> - Datos del cliente y su correo electrónico si existe, de lo contrario null.
+   */
+  static async buscarPorIdCliente(idCliente) {
+    const query = `
+      SELECT u.correo, c.nombre, c.apellido, c.telefono, c.direccion 
+      FROM Cliente c
+      JOIN Usuario u ON c.idUsuario = u.idUsuario
+      WHERE c.idCliente = ?
+    `;
+    const [filas] = await pool.query(query, [idCliente]);
     return filas.length > 0 ? filas[0] : null;
   }
 

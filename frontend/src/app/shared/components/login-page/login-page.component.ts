@@ -28,6 +28,12 @@ export class LoginPageComponent implements OnInit {
   /** Nombre del usuario para el registro. */
   nombre = signal<string>('');
 
+  /** Apellido del usuario para el registro. */
+  apellido = signal<string>('');
+
+  /** Teléfono del usuario para el registro. */
+  telefono = signal<string>('');
+
   /** Confirmar Contraseña ingresada por el usuario en el registro. */
   confirmarContrasenia = signal<string>('');
 
@@ -134,6 +140,8 @@ export class LoginPageComponent implements OnInit {
     this.mensajeError.set('');
     this.mensajeExito.set('');
     this.nombre.set('');
+    this.apellido.set('');
+    this.telefono.set('');
     this.correo.set('');
     this.contrasenia.set('');
     this.confirmarContrasenia.set('');
@@ -151,12 +159,21 @@ export class LoginPageComponent implements OnInit {
    */
   registrarUsuario(): void {
     const nombreVal = this.nombre().trim();
+    const apellidoVal = this.apellido().trim();
+    const telefonoVal = this.telefono().trim();
     const correoVal = this.correo().trim();
     const contraVal = this.contrasenia().trim();
     const confirmaVal = this.confirmarContrasenia().trim();
 
-    if (!nombreVal || !correoVal || !contraVal || !confirmaVal) {
+    if (!nombreVal || !apellidoVal || !telefonoVal || !correoVal || !contraVal || !confirmaVal) {
       this.mensajeError.set('Por favor, completa todos los campos del registro.');
+      return;
+    }
+
+    // Validación del formato de teléfono (10 dígitos)
+    const regexTelefono = /^\d{10}$/;
+    if (!regexTelefono.test(telefonoVal)) {
+      this.mensajeError.set('Por favor, introduce un número de teléfono válido de 10 dígitos.');
       return;
     }
 
@@ -184,7 +201,7 @@ export class LoginPageComponent implements OnInit {
       return;
     }
 
-    this.autenticacionService.registrar(nombreVal, correoVal, contraVal).subscribe(registrado => {
+    this.autenticacionService.registrar(nombreVal, apellidoVal, correoVal, contraVal, telefonoVal).subscribe(registrado => {
       if (registrado) {
         this.mensajeError.set('');
         this.mensajeExito.set('¡Cuenta creada con éxito! Iniciando sesión...');

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PedidoCocina } from '../tablero-kanban/tablero-kanban.component';
 import { PedidoService, CorteCaja } from '../../../../core/services/pedido.service';
+import { GeneradorDocumentosService } from '../../../../core/services/generador-documentos.service';
 
 /**
  * Componente: VistaCorteComponent
@@ -23,6 +24,9 @@ import { PedidoService, CorteCaja } from '../../../../core/services/pedido.servi
 })
 export class VistaCorteComponent {
   private servicioPedidos = inject(PedidoService);
+  private generadorDocumentos = inject(GeneradorDocumentosService);
+
+  ultimoCorteGenerado: CorteCaja | null = null;
 
   @Input() pedidos: PedidoCocina[] = [];
   @Input() nombreEmpleado: string = 'Carlos Mendoza';
@@ -95,8 +99,29 @@ export class VistaCorteComponent {
     const cortesActuales = this.servicioPedidos.cortesCaja();
     this.servicioPedidos.cortesCaja.set([nuevoCorte, ...cortesActuales]);
 
+    this.ultimoCorteGenerado = nuevoCorte;
     this.corteDeHoyEnviado = true;
     this.observaciones = '';
     this.corteEnviado.emit(`Corte de caja ${nuevoCorte.id} enviado exitosamente al administrador.`);
+  }
+
+  /**
+   * Intención: Generar y descargar el comprobante de corte de caja en PDF.
+   * Retorno: void.
+   */
+  descargarCortePDF(): void {
+    if (this.ultimoCorteGenerado) {
+      this.generadorDocumentos.descargarCortePDF(this.ultimoCorteGenerado);
+    }
+  }
+
+  /**
+   * Intención: Generar y descargar el comprobante de corte de caja en XML.
+   * Retorno: void.
+   */
+  descargarCorteXML(): void {
+    if (this.ultimoCorteGenerado) {
+      this.generadorDocumentos.descargarCorteXML(this.ultimoCorteGenerado);
+    }
   }
 }

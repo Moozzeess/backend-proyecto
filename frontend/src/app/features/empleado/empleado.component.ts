@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AutenticacionService } from '../../core/services/autenticacion.service';
+import { PedidoService } from '../../core/services/pedido.service';
+import { InventarioService } from '../../core/services/inventario.service';
 
 // Importación de subcomponentes locales
 import { TableroKanbanComponent, PedidoCocina } from './components/tablero-kanban/tablero-kanban.component';
@@ -11,6 +13,7 @@ import { VistaInventarioComponent, IngredienteCocina } from './components/vista-
 import { VistaNotificacionesComponent, AlertaNotificacion } from './components/vista-notificaciones/vista-notificaciones.component';
 import { VistaCorteComponent } from './components/vista-corte/vista-corte.component';
 import { FacturacionComponent } from '../../shared/components/facturacion/facturacion.component';
+import { VistaVentasSucursalComponent } from './components/vista-ventas-sucursal/vista-ventas-sucursal.component';
 
 /**
  * Componente: EmpleadoComponent
@@ -33,20 +36,30 @@ import { FacturacionComponent } from '../../shared/components/facturacion/factur
     VistaInventarioComponent,
     VistaNotificacionesComponent,
     VistaCorteComponent,
-    FacturacionComponent
+    FacturacionComponent,
+    VistaVentasSucursalComponent
   ],
   templateUrl: './empleado.component.html'
 })
 export class EmpleadoComponent implements OnInit {
+  private autenticacionService = inject(AutenticacionService);
+  private pedidoService = inject(PedidoService);
+  private inventarioService = inject(InventarioService);
+
   /**
    * Nombre del empleado logueado en la sesión.
    */
-  nombreEmpleado: string = 'Carlos Mendoza';
+  nombreEmpleado: string = 'Empleado';
+
+  /**
+   * Puesto laboral del empleado.
+   */
+  puestoEmpleado: string = 'Cajero General';
 
   /**
    * Sección seleccionada actualmente para visualización en el panel.
    */
-  seccionActiva: 'pedidos' | 'cocina' | 'entregas' | 'inventario' | 'notificaciones' | 'corte' | 'facturacion' = 'pedidos';
+  seccionActiva: 'pedidos' | 'ventassucursal' | 'cocina' | 'entregas' | 'inventario' | 'notificaciones' | 'corte' | 'facturacion' = 'pedidos';
 
   /**
    * Listado reactivo de pedidos para simulación en cocina y reparto.
@@ -67,37 +80,106 @@ export class EmpleadoComponent implements OnInit {
    * Intención: Constructor por defecto del componente.
    * Parámetros:
    *   - router (Router): Servicio de enrutamiento de Angular.
-   *   - autenticacionService (AutenticacionService): Servicio de sesión.
    */
   constructor(
-    private router: Router,
-    private autenticacionService: AutenticacionService
+    private router: Router
   ) { }
 
   /**
-   * Intención: Inicializar datos base simulados para pedidos, inventario y notificaciones al cargar el componente.
+   * Intención: Inicializar datos base reales para pedidos, inventario y notificaciones al cargar el componente.
    * Retorno: void.
    */
   ngOnInit(): void {
-    this.listaPedidos = [
-      { id: '#4521', platillo: 'Pepperoni Familiar', estado: 'Nuevo', progreso: 0 },
-      { id: '#4518', platillo: 'Mexicana Grande', estado: 'Preparando', progreso: 70 },
-      { id: '#4510', platillo: 'Hawaiana Familiar', estado: 'Listo', progreso: 100 },
-      { id: '#4505', platillo: 'Cuatro Quesos', estado: 'Entregado', progreso: 100 }
-    ];
+    // Obtener datos reales del empleado logueado
+    const usuarioLogueado = this.autenticacionService.usuarioActual();
+    if (usuarioLogueado) {
+      this.nombreEmpleado = usuarioLogueado.nombre;
+      this.puestoEmpleado = usuarioLogueado.puesto || 'Cajero General';
+      
+      // Asignar sección activa inicial basada en el cargo/puesto
+      if (this.puestoEmpleado === 'Chef Pizzero') {
+        this.seccionActiva = 'cocina';
+      } else if (this.puestoEmpleado === 'Repartidor Motociclista') {
+        this.seccionActiva = 'entregas';
+      } else if (this.puestoEmpleado === 'Cajero General') {
+        this.seccionActiva = 'pedidos';
+      } else {
+        this.seccionActiva = 'pedidos';
+      }
+    }
 
-    this.listaInventario = [
-      { id: 1, nombre: 'Queso Mozzarella', stockActual: 12, stockMinimo: 15, unidad: 'kg' },
-      { id: 2, nombre: 'Pepperoni', stockActual: 18, stockMinimo: 8, unidad: 'kg' },
-      { id: 3, nombre: 'Jamón York', stockActual: 9, stockMinimo: 10, unidad: 'kg' },
-      { id: 4, nombre: 'Piña Caramelizada', stockActual: 25, stockMinimo: 5, unidad: 'kg' },
-      { id: 5, nombre: 'Champiñones', stockActual: 14, stockMinimo: 6, unidad: 'kg' }
-    ];
+    this.cargarDatosReales();
+  }
 
-    this.listaNotificaciones = [
-      { id: 'N1', tipo: 'alerta', mensaje: 'Queso Mozzarella con stock críticamente bajo (12 kg).', fechaHora: '10:30' },
-      { id: 'N2', tipo: 'alerta', mensaje: 'Jamón York con stock críticamente bajo (9 kg).', fechaHora: '10:31' }
-    ];
+  /**
+   * Intención: Cargar pedidos e inventario reales desde el backend y refrescar la UI.
+   * Retorno: void.
+   */
+  cargarDatosReales(): void {
+    // Cargar Pedidos del Backend
+    this.pedidoService.obtenerTodos().subscribe({
+      next: (pedidos) => {
+        // Mapear los pedidos de la base de datos al formato del Tablero Kanban y Cocina
+        this.listaPedidos = pedidos.map(p => {
+          let estadoTraducido: 'Nuevo' | 'Preparando' | 'Listo' | 'Entregado' = 'Nuevo';
+          let progreso = 0;
+
+          const estLower = p.estado.toLowerCase();
+          if (estLower === 'preparando') {
+            estadoTraducido = 'Preparando';
+            progreso = 30;
+          } else if (estLower === 'listo') {
+            estadoTraducido = 'Listo';
+            progreso = 100;
+          } else if (estLower === 'entregado' || estLower === 'pagado') {
+            estadoTraducido = 'Entregado';
+            progreso = 100;
+          } else {
+            estadoTraducido = 'Nuevo';
+            progreso = 0;
+          }
+
+          // Obtener el primer platillo de la lista para mostrar como etiqueta
+          const platillo = p.productos.length > 0 ? `${p.productos[0].cantidad}x ${p.productos[0].producto.nombre}` : 'Pizza Gourmet';
+
+          return {
+            id: p.id,
+            platillo,
+            estado: estadoTraducido,
+            progreso
+          };
+        });
+      },
+      error: (err) => {
+        this.agregarNotificacion('alerta', 'No se pudieron recuperar los pedidos en tiempo real.');
+      }
+    });
+
+    // Cargar Inventario del Backend
+    this.inventarioService.obtenerIngredientes().subscribe({
+      next: (ingredientes) => {
+        this.listaInventario = ingredientes.map(i => ({
+          id: i.id,
+          nombre: i.nombre,
+          stockActual: i.stockActual,
+          stockMinimo: i.stockMinimo,
+          unidad: i.unidad
+        }));
+
+        // Limpiar alertas de inventario anteriores
+        this.listaNotificaciones = this.listaNotificaciones.filter(n => n.tipo !== 'alerta' || !n.mensaje.includes('stock'));
+
+        // Generar alertas si el stock es críticamente bajo
+        this.listaInventario.forEach(ing => {
+          if (ing.stockActual <= ing.stockMinimo) {
+            this.agregarNotificacion('alerta', `${ing.nombre} con stock críticamente bajo (${ing.stockActual} ${ing.unidad}).`);
+          }
+        });
+      },
+      error: (err) => {
+        this.agregarNotificacion('alerta', 'No se pudo sincronizar el inventario de insumos.');
+      }
+    });
   }
 
   /**
@@ -121,7 +203,7 @@ export class EmpleadoComponent implements OnInit {
   /**
    * Intención: Cambiar la pestaña o módulo activo en el sidebar.
    * Parámetros:
-   *   - seccion: 'pedidos' | 'cocina' | 'entregas' | 'inventario' | 'notificaciones' | 'corte' - Nueva pestaña activa.
+   *   - seccion: 'pedidos' | 'cocina' | 'entregas' | 'inventario' | 'notificaciones' | 'corte' | 'facturacion' - Nueva pestaña activa.
    * Retorno: void.
    */
   cambiarSeccion(seccion: typeof this.seccionActiva): void {
@@ -129,7 +211,7 @@ export class EmpleadoComponent implements OnInit {
   }
 
   /**
-   * Intención: Controlar los cambios de estado en las órdenes de cocina y reparto.
+   * Intención: Controlar los cambios de estado en las órdenes de cocina y reparto en la base de datos real.
    * Parámetros:
    *   - evento ({ id: string, nuevoEstado: 'Nuevo' | 'Preparando' | 'Listo' | 'Entregado' }): Datos de la orden modificada.
    * Retorno: void.
@@ -137,18 +219,31 @@ export class EmpleadoComponent implements OnInit {
   alCambiarEstadoPedido(evento: { id: string; nuevoEstado: 'Nuevo' | 'Preparando' | 'Listo' | 'Entregado' }): void {
     const pedido = this.listaPedidos.find(p => p.id === evento.id);
     if (pedido) {
-      pedido.estado = evento.nuevoEstado;
-      if (evento.nuevoEstado === 'Preparando') {
-        pedido.progreso = 30;
-      } else if (evento.nuevoEstado === 'Listo') {
-        pedido.progreso = 100;
-      }
-      this.agregarNotificacion('informacion', `Pedido ${pedido.id} actualizado a estado: ${evento.nuevoEstado}`);
+      // Registrar cambio en el backend real
+      this.pedidoService.actualizarEstadoPedido(evento.id, evento.nuevoEstado).subscribe({
+        next: (exito) => {
+          if (exito) {
+            pedido.estado = evento.nuevoEstado;
+            if (evento.nuevoEstado === 'Preparando') {
+              pedido.progreso = 30;
+            } else if (evento.nuevoEstado === 'Listo') {
+              pedido.progreso = 100;
+            }
+            this.agregarNotificacion('informacion', `Pedido ${pedido.id} actualizado a estado: ${evento.nuevoEstado}`);
+            this.cargarDatosReales();
+          } else {
+            this.agregarNotificacion('alerta', `No se pudo actualizar el pedido ${pedido.id} en el servidor.`);
+          }
+        },
+        error: (err) => {
+          this.agregarNotificacion('alerta', `Error al comunicar actualización del pedido ${pedido.id}.`);
+        }
+      });
     }
   }
 
   /**
-   * Intención: Incrementar el stock del ingrediente seleccionado y limpiar alertas relacionadas si supera el mínimo.
+   * Intención: Incrementar el stock del ingrediente seleccionado en la base de datos y limpiar alertas relacionadas.
    * Parámetros:
    *   - ingredienteId (number): ID del insumo a reabastecer.
    * Retorno: void.
@@ -156,15 +251,19 @@ export class EmpleadoComponent implements OnInit {
   alReabastecerStock(ingredienteId: number): void {
     const ingrediente = this.listaInventario.find(i => i.id === ingredienteId);
     if (ingrediente) {
-      ingrediente.stockActual += 10;
-      this.agregarNotificacion('exito', `Se reabasteció ${ingrediente.nombre}. Nuevo stock: ${ingrediente.stockActual} ${ingrediente.unidad}`);
-      
-      // Si ya supera el stock mínimo, eliminamos la alerta de la lista de notificaciones
-      if (ingrediente.stockActual > ingrediente.stockMinimo) {
-        this.listaNotificaciones = this.listaNotificaciones.filter(
-          nota => !nota.mensaje.includes(ingrediente.nombre)
-        );
-      }
+      this.inventarioService.reabastecerIngrediente(ingredienteId, 10).subscribe({
+        next: (exito) => {
+          if (exito) {
+            this.agregarNotificacion('exito', `Se reabasteció ${ingrediente.nombre} (+10 ${ingrediente.unidad}).`);
+            this.cargarDatosReales();
+          } else {
+            this.agregarNotificacion('alerta', `Fallo al reabastecer ${ingrediente.nombre} en base de datos.`);
+          }
+        },
+        error: () => {
+          this.agregarNotificacion('alerta', `Error de red al reabastecer ${ingrediente.nombre}.`);
+        }
+      });
     }
   }
 
