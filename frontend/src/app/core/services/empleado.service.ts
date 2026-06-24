@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { EmpleadoAdmin } from '../../features/administrador/administrador.component';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Servicio: EmpleadoService
@@ -13,7 +14,7 @@ import { EmpleadoAdmin } from '../../features/administrador/administrador.compon
 })
 export class EmpleadoService {
   private http = inject(HttpClient);
-  private readonly apiHost = 'http://localhost:3000/api/empleados';
+  private readonly apiHost = `${entorno.urlBaseApi}/empleados`;
 
   /**
    * Obtiene la lista completa de empleados.

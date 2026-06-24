@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IngredienteInventario } from '../../features/administrador/administrador.component';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Servicio: InventarioService
@@ -13,7 +14,7 @@ import { IngredienteInventario } from '../../features/administrador/administrado
 })
 export class InventarioService {
   private http = inject(HttpClient);
-  private readonly apiHost = 'http://localhost:3000/api/inventario';
+  private readonly apiHost = `${entorno.urlBaseApi}/inventario`;
 
   /**
    * Obtiene todos los ingredientes registrados del almacén.

@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map, catchError, of } from 'rxjs';
 import { Usuario } from '../models/usuario.model';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Servicio: AutenticacionService
@@ -18,7 +19,7 @@ export class AutenticacionService {
   idClienteActual = signal<number | null>(null);
 
   /** Dirección base del endpoint del backend */
-  private readonly apiHost = 'http://localhost:3000/api/autenticacion';
+  private readonly apiHost = `${entorno.urlBaseApi}/autenticacion`;
 
   /**
    * Constructor de AutenticacionService.

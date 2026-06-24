@@ -5,6 +5,7 @@ import { map, catchError } from 'rxjs/operators';
 import { ItemCarrito } from '../models/carrito.model';
 import { AutenticacionService } from './autenticacion.service';
 import { CORTES_CAJA_MOCK, FACTURAS_MOCK } from '../models/datos-simulados';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Interfaz que representa la estructura de un pedido activo en el sistema.
@@ -89,7 +90,7 @@ export class PedidoService {
   /** Signal reactivo que almacena el pedido seleccionado para facturar. */
   pedidoParaFacturar = signal<PedidoHistorico | null>(null);
 
-  private readonly apiHost = 'http://localhost:3000/api/pedidos';
+  private readonly apiHost = `${entorno.urlBaseApi}/pedidos`;
 
   /**
    * Constructor del servicio de pedidos.
@@ -290,7 +291,7 @@ export class PedidoService {
    * Consulta todos los cortes de caja del personal cajero.
    */
   obtenerCortesCaja(): Observable<CorteCaja[]> {
-    return this.http.get<{ exito: boolean; datos: CorteCaja[] }>('http://localhost:3000/api/cortes').pipe(
+    return this.http.get<{ exito: boolean; datos: CorteCaja[] }>(`${entorno.urlBaseApi}/cortes`).pipe(
       map(res => {
         if (res.exito) {
           this.cortesCaja.set(res.datos);
@@ -304,7 +305,7 @@ export class PedidoService {
    * Aprueba o cambia el estado de un corte de caja en el backend real.
    */
   aprobarCorteCaja(idCorte: string, estado: string = 'Aprobado'): Observable<boolean> {
-    return this.http.patch<{ exito: boolean }>('http://localhost:3000/api/cortes/' + encodeURIComponent(idCorte) + '/aprobar', { estado }).pipe(
+    return this.http.patch<{ exito: boolean }>(`${entorno.urlBaseApi}/cortes/` + encodeURIComponent(idCorte) + '/aprobar', { estado }).pipe(
       map(res => res.exito)
     );
   }

@@ -80,10 +80,6 @@ export class LoginPageComponent implements OnInit {
         this.rutaRedireccion.set(parametros['redireccion']);
       }
     });
-
-    // Poner credenciales sugeridas por defecto (Cliente) para facilitar pruebas
-    this.correo.set('cliente.juan@correo.com');
-    this.contrasenia.set('123456');
   }
 
   /**

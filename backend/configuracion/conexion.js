@@ -7,11 +7,11 @@ require('dotenv').config();
  * Configurado utilizando variables de entorno.
  */
 const configuracionPool = {
-  host: process.env.BD_HOST || 'localhost',
-  user: process.env.BD_USUARIO || 'root',
-  password: process.env.BD_CONTRASENA || '',
-  database: process.env.BD_NOMBRE || 'pizzeria_db',
-  port: parseInt(process.env.BD_PUERTO || '3306', 10),
+  host: process.env.BD_HOST,
+  user: process.env.BD_USUARIO,
+  password: process.env.BD_CONTRASENA,
+  database: process.env.BD_NOMBRE,
+  port: parseInt(process.env.BD_PUERTO, 10),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

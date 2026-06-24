@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SucursalAdmin } from '../../features/administrador/administrador.component';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Servicio: SucursalService
@@ -13,7 +14,7 @@ import { SucursalAdmin } from '../../features/administrador/administrador.compon
 })
 export class SucursalService {
   private http = inject(HttpClient);
-  private readonly apiHost = 'http://localhost:3000/api/sucursales';
+  private readonly apiHost = `${entorno.urlBaseApi}/sucursales`;
 
   /**
    * Consulta todas las sucursales con cálculos en tiempo real desde el backend.

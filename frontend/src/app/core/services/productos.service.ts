@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Producto } from '../models/producto.model';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Servicio: ProductosService
@@ -12,7 +13,7 @@ import { Producto } from '../models/producto.model';
 })
 export class ProductosService {
   /** Dirección base del endpoint del backend */
-  private readonly apiHost = 'http://localhost:3000/api/productos';
+  private readonly apiHost = `${entorno.urlBaseApi}/productos`;
 
   /**
    * Constructor del servicio de productos.

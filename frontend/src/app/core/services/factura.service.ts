@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FacturaAdmin } from '../../features/administrador/administrador.component';
+import { entorno } from '../../../environments/environment';
 
 /**
  * Servicio: FacturaService
@@ -13,7 +14,7 @@ import { FacturaAdmin } from '../../features/administrador/administrador.compone
 })
 export class FacturaService {
   private http = inject(HttpClient);
-  private readonly apiHost = 'http://localhost:3000/api/facturas';
+  private readonly apiHost = `${entorno.urlBaseApi}/facturas`;
 
   /**
    * Obtiene la lista completa de facturas emitidas por la pizzería.
