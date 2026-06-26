@@ -22,4 +22,7 @@ export interface Usuario {
 
   /** Teléfono de contacto del usuario */
   telefono?: string;
+
+  /** Token JWT de sesión activa */
+  token?: string;
 }

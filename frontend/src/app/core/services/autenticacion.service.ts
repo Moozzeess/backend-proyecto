@@ -23,11 +23,24 @@ export class AutenticacionService {
 
   /**
    * Constructor de AutenticacionService.
-   * Intención: Inyectar el cliente HTTP para conectar con la API.
+   * Intención: Inyectar el cliente HTTP y restaurar la sesión desde localStorage si existe.
    * Parámetros:
    *   - http (HttpClient): Instancia del cliente HTTP.
    */
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    try {
+      const usuarioGuardado = localStorage.getItem('pizza-pizza-usuario-sesion');
+      const idClienteGuardado = localStorage.getItem('pizza-pizza-id-cliente-sesion');
+      if (usuarioGuardado) {
+        this.usuarioActual.set(JSON.parse(usuarioGuardado));
+      }
+      if (idClienteGuardado) {
+        this.idClienteActual.set(Number(idClienteGuardado) || null);
+      }
+    } catch (error) {
+      // Casos límite: Acceso a localStorage denegado en el navegador
+    }
+  }
 
   /**
    * Inicia sesión del usuario validando credenciales contra la base de datos real.
@@ -46,7 +59,7 @@ export class AutenticacionService {
       correo: correo.trim().toLowerCase(),
       contrasena: contrasenia.trim()
     }).pipe(
-      map(respuesta => {
+      tap(respuesta => {
         if (respuesta.exito && respuesta.datos) {
           const datos = respuesta.datos;
           // Normalizar rol 'administrador' de la DB a 'admin' usado en frontend
@@ -63,15 +76,25 @@ export class AutenticacionService {
             correo: datos.correo,
             rol: rolFront,
             puesto: datos.puesto,
-            telefono: datos.telefono
+            telefono: datos.telefono,
+            token: datos.token
           };
 
           this.usuarioActual.set(usuario);
-          this.idClienteActual.set(datos.idCliente || datos.idEmpleado || null);
-          return true;
+          const idAsociado = datos.idCliente || datos.idEmpleado || null;
+          this.idClienteActual.set(idAsociado);
+
+          try {
+            localStorage.setItem('pizza-pizza-usuario-sesion', JSON.stringify(usuario));
+            if (idAsociado) {
+              localStorage.setItem('pizza-pizza-id-cliente-sesion', String(idAsociado));
+            }
+          } catch (error) {
+            // Casos límite: Acceso a localStorage denegado en escritura
+          }
         }
-        return false;
       }),
+      map(respuesta => respuesta.exito && respuesta.datos !== null),
       catchError(() => of(false))
     );
   }
@@ -109,12 +132,18 @@ export class AutenticacionService {
 
   /**
    * Finaliza la sesión actual del usuario, limpiando el estado.
-   * Intención: Remover credenciales de memoria.
+   * Intención: Remover credenciales de memoria y de localStorage.
    * Retorno: void.
    */
   cerrarSesion(): void {
     this.usuarioActual.set(null);
     this.idClienteActual.set(null);
+    try {
+      localStorage.removeItem('pizza-pizza-usuario-sesion');
+      localStorage.removeItem('pizza-pizza-id-cliente-sesion');
+    } catch (error) {
+      // Casos límite: Acceso a localStorage denegado en eliminación
+    }
   }
 
   /**

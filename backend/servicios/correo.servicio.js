@@ -33,7 +33,8 @@ async function obtenerTransportador() {
       user: SMTP_USER,
       pass: SMTP_PASS
     },
-    name: 'pizza-pizza-backend' // Identificador EHLO para que Google/Gmail reconozca el origen del host en Render
+    name: 'pizza-pizza-backend', // Identificador EHLO para que Google/Gmail reconozca el origen del host en Render
+    family: 4 // Forzar la conexión por IPv4 para evitar el error ENETUNREACH en redes sin soporte IPv6 completo
   });
 
   return transportadorReal;
