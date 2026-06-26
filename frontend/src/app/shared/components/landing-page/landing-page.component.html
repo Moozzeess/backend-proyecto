@@ -5,14 +5,29 @@
             Pizza Pizza
         </h1>
         <div class="hidden md:flex gap-10 font-medium">
-            <a href="#inicio">Inicio</a>
-            <a routerLink="/menu">Menú</a>
-            <a href="#promociones">Promociones</a>
-            <a href="#contacto">Contacto</a>
+            <a href="#inicio" class="no-underline text-gray-700">Inicio</a>
+            <a routerLink="/menu" class="no-underline text-gray-700">Menú</a>
+            <a href="#promociones" class="no-underline text-gray-700">Promociones</a>
+            <a href="#contacto" class="no-underline text-gray-700">Contacto</a>
         </div>
-        <button routerLink="/login" class="btn-primary text-white px-6 py-3 rounded-full shadow-xl cursor-pointer">
-            Iniciar Sesión
-        </button>
+        <div class="flex items-center gap-4">
+            <!-- BOTÓN CARRITO NAVBAR -->
+            <button 
+                class="relative p-2 hover:scale-110 transition-transform cursor-pointer bg-transparent border-none flex items-center justify-center"
+                (click)="abrirModalCarrito()"
+                [disabled]="totalElementosCarrito() === 0"
+                aria-label="Ver carrito">
+                <svg class="w-6 h-6 text-[#d6254d]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <span *ngIf="totalElementosCarrito() > 0"
+                    class="absolute -top-1 -right-1 bg-[#d6254d] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    {{ totalElementosCarrito() }}
+                </span>
+            </button>
+
+            <button routerLink="/login" class="btn-primary text-white px-6 py-3 rounded-full shadow-xl cursor-pointer">
+                Iniciar Sesión
+            </button>
+        </div>
     </div>
 </nav>
 
@@ -227,3 +242,70 @@
         </p>
     </div>
 </footer>
+
+<!-- CARRITO FLOTANTE -->
+<button 
+    *ngIf="totalElementosCarrito() > 0"
+    (click)="abrirModalCarrito()"
+    class="fixed bottom-8 right-8 bg-[#d6254d] hover:bg-[#ff5475] text-white px-8 py-5 rounded-full shadow-2xl font-bold flex items-center gap-3 transition-transform hover:scale-105 cursor-pointer z-40">
+    <span class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+        Ver Carrito ({{ totalElementosCarrito() }})
+    </span>
+    <span class="bg-white/20 px-3 py-1 rounded-full text-sm">${{ totalPagarCarrito() }}.00</span>
+</button>
+
+<!-- MODAL DEL CARRITO DE COMPRAS -->
+<div class="modal-backdrop" *ngIf="modalAbierto()">
+    <div class="modal-contenido">
+        <!-- Cabecera -->
+        <div class="modal-cabecera">
+            <h3 class="text-2xl font-bold text-gray-800 font-sans">Tu Carrito</h3>
+            <button 
+                (click)="cerrarModalCarrito()" 
+                class="text-gray-400 hover:text-gray-600 text-3xl font-bold cursor-pointer bg-transparent border-none">
+                &times;
+            </button>
+        </div>
+
+        <!-- Cuerpo -->
+        <div class="modal-cuerpo">
+            <div *ngFor="let item of carrito()" class="item-carrito-fila flex items-center justify-between py-4 border-b border-gray-100 gap-4">
+                <div class="item-carrito-info flex items-center gap-3">
+                    <img [src]="obtenerImagenProducto(item.producto)" class="item-carrito-imagen w-16 h-16 rounded-xl object-cover" [alt]="item.producto.nombre">
+                    <div class="item-carrito-detalles">
+                        <h4 class="font-bold text-gray-800 text-base">{{ item.producto.nombre }}</h4>
+                        <p class="text-[#d6254d] font-bold text-sm mt-1">${{ item.precioUnitario ?? item.producto.precio }} c/u</p>
+                    </div>
+                </div>
+
+                <div class="item-carrito-controles flex items-center gap-2">
+                    <button class="btn-cantidad w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold text-gray-500 hover:bg-[#d6254d] hover:text-white transition-colors cursor-pointer" (click)="decrementarCantidad(item.producto.id)">&minus;</button>
+                    <span class="font-bold text-gray-800 text-lg w-6 text-center">{{ item.cantidad }}</span>
+                    <button class="btn-cantidad w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold text-gray-500 hover:bg-[#d6254d] hover:text-white transition-colors cursor-pointer" (click)="incrementarCantidad(item.producto.id)">&plus;</button>
+                    
+                    <button 
+                        (click)="eliminarDelCarrito(item.producto.id)" 
+                        class="text-gray-400 hover:text-[#d6254d] ml-2 cursor-pointer flex items-center justify-center bg-transparent border-none"
+                        aria-label="Eliminar del carrito">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie -->
+        <div class="modal-pie flex justify-between items-center pt-6 border-t border-gray-100">
+            <div>
+                <span class="text-gray-500 block text-xs uppercase font-bold tracking-wider">Total a pagar</span>
+                <span class="text-3xl font-extrabold text-[#d6254d]">${{ totalPagarCarrito() }}.00</span>
+            </div>
+            
+            <button 
+                (click)="realizarPedido()"
+                class="bg-[#d6254d] hover:bg-[#ff5475] text-white px-8 py-4 rounded-full font-bold shadow-lg transition-colors cursor-pointer border-none text-base">
+                Confirmar Orden
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { Producto } from '../../../core/models/producto.model';
 import { ProductosService } from '../../../core/services/productos.service';
 import { CarritoService } from '../../../core/services/carrito.service';
@@ -31,11 +31,13 @@ export class LandingPageComponent implements OnInit {
    *   - productosService (ProductosService): Servicio para consultar productos de la base de datos.
    *   - carritoService (CarritoService): Servicio del carrito de compras.
    *   - alertasService (AlertasService): Servicio centralizado de notificaciones.
+   *   - router (Router): Navegación entre rutas.
    */
   constructor(
     private productosService: ProductosService,
     private carritoService: CarritoService,
-    private alertasService: AlertasService
+    private alertasService: AlertasService,
+    private router: Router
   ) {}
 
   /**
@@ -77,12 +79,22 @@ export class LandingPageComponent implements OnInit {
     this.categoriaSeleccionada.set(categoria);
   }
 
+  /** Estado de visibilidad del modal del carrito */
+  modalAbierto = signal<boolean>(false);
+
+  /** Carrito de compras interactivo (vinculado al servicio global) */
+  carrito = computed(() => this.carritoService.carrito());
+
+  /** Cantidad total de elementos en el carrito */
+  totalElementosCarrito = computed(() => this.carritoService.totalElementos());
+
+  /** Monto total a pagar */
+  totalPagarCarrito = computed(() => this.carritoService.totalPagar());
+
   /**
    * Intención: Agregar un producto seleccionado al carrito de compras global.
    * Parámetros:
    *   - producto (Producto): El producto a añadir.
-   * Retorno: void.
-   * Casos límite: Si el producto recibido es nulo, no realiza ninguna acción.
    */
   agregarAlCarrito(producto: Producto): void {
     if (!producto) return;
@@ -91,6 +103,53 @@ export class LandingPageComponent implements OnInit {
       `Se agregó ${producto.nombre} al carrito con éxito.`,
       'aceptado'
     );
+  }
+
+  /**
+   * Intención: Abrir el modal del carrito de compras si tiene elementos.
+   */
+  abrirModalCarrito(): void {
+    if (this.totalElementosCarrito() > 0) {
+      this.modalAbierto.set(true);
+    }
+  }
+
+  /**
+   * Intención: Cerrar el modal del carrito de compras.
+   */
+  cerrarModalCarrito(): void {
+    this.modalAbierto.set(false);
+  }
+
+  /**
+   * Intención: Incrementar en 1 la cantidad de un artículo en el carrito.
+   */
+  incrementarCantidad(productoId: number): void {
+    this.carritoService.incrementarCantidad(productoId);
+  }
+
+  /**
+   * Intención: Decrementar en 1 la cantidad de un artículo en el carrito.
+   */
+  decrementarCantidad(productoId: number): void {
+    this.carritoService.decrementarCantidad(productoId);
+  }
+
+  /**
+   * Intención: Eliminar un artículo por completo del carrito.
+   */
+  eliminarDelCarrito(productoId: number): void {
+    this.carritoService.eliminarDelCarrito(productoId);
+  }
+
+  /**
+   * Intención: Redirigir al usuario al proceso de pago. Si no está autenticado,
+   *            la vista de pago lo enviará al login guardando la redirección de retorno.
+   */
+  realizarPedido(): void {
+    if (this.carrito().length === 0) return;
+    this.cerrarModalCarrito();
+    this.router.navigate(['/procesar-compra']);
   }
 
   /**
