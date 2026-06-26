@@ -9,6 +9,6 @@
 declare const process: any;
 
 export const entorno = {
-  produccion: false,
-  urlBaseApi: process.env['URL_BASE_API']
+  produccion: process.env.NODE_ENV === 'production',
+  urlBaseApi: process.env.NG_APP_URL_BASE_API || ''
 };
