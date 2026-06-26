@@ -307,15 +307,23 @@ class CorreoServicio {
    * Parámetros: Ninguno.
    * Retorno: {Promise<boolean>} True si la validación es exitosa, false en caso contrario.
    */
-  static async verificarConexion() {
-    try {
-      const transportador = await obtenerTransportador();
-      await transportador.verify();
-      registrador.info('Servicio de correo: Conexión y credenciales con el servidor SMTP verificadas correctamente.');
-      return true;
-    } catch (error) {
-      registrador.error('[pizza pizza backend] Servicio de correo: Error crítico de conexión SMTP en producción.', { mensaje: error.message });
-      throw error;
+  static async verificarConexion(intentosMaximos = 5, retrasoMs = 2000) {
+    for (let intento = 1; intento <= intentosMaximos; intento++) {
+      try {
+        const transportador = await obtenerTransportador();
+        await transportador.verify();
+        registrador.info('Servicio de correo: Conexión y credenciales con el servidor SMTP verificadas correctamente.');
+        return true;
+      } catch (error) {
+        registrador.error(`Intento ${intento}/${intentosMaximos} fallido: Servicio de correo: Error crítico de conexión SMTP en producción.`, { mensaje: error.message });
+
+        if (intento < intentosMaximos) {
+          registrador.info(`Reintentando conexión SMTP en ${retrasoMs / 1000} segundos...`);
+          await new Promise(resolve => setTimeout(resolve, retrasoMs));
+        } else {
+          throw error;
+        }
+      }
     }
   }
 }

@@ -38,30 +38,37 @@ const pool = process.env.DATABASE_URL
  *   - Si el servidor de base de datos está apagado o inaccesible, captura el error y retorna false sin tumbar el servidor Express.
  *   - Si las credenciales de acceso son incorrectas, captura el error de credenciales inválidas y retorna false.
  */
-async function probarConexion() {
+async function probarConexion(intentosMaximos = 5, retrasoMs = 2000) {
   let conexion;
 
-  try {
-    conexion = await pool.getConnection();
+  for (let intento = 1; intento <= intentosMaximos; intento++) {
+    try {
+      conexion = await pool.getConnection();
 
-    // Ejecuta una consulta simple para validar la conectividad real.
-    await conexion.query('SELECT 1');
+      // Ejecuta una consulta simple para validar la conectividad real.
+      await conexion.query('SELECT 1');
 
-    registrador.info('Conexión a MySQL verificada correctamente.');
-    return true;
-  } catch (error) {
-    registrador.error('Error al conectar con la base de datos MySQL.', {
-      mensaje: error.message,
-      codigo: error.code,
-      errno: error.errno
-    });
+      registrador.info('Conexión a MySQL verificada correctamente.');
+      return true;
+    } catch (error) {
+      registrador.error(`Intento ${intento}/${intentosMaximos} fallido al conectar con la base de datos MySQL.`, {
+        mensaje: error.message,
+        codigo: error.code,
+        errno: error.errno
+      });
 
-    return false;
-  } finally {
-    if (conexion) {
-      conexion.release();
+      if (intento < intentosMaximos) {
+        registrador.info(`Reintentando conexión a base de datos en ${retrasoMs / 1000} segundos...`);
+        await new Promise(resolve => setTimeout(resolve, retrasoMs));
+      }
+    } finally {
+      if (conexion) {
+        conexion.release();
+      }
     }
   }
+
+  return false;
 }
 
 module.exports = {
