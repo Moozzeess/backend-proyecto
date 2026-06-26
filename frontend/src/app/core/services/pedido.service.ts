@@ -132,6 +132,57 @@ export class PedidoService {
   }
 
   /**
+   * Actualiza el pedido activo realizando una consulta rápida al historial.
+   * Intención: Mantener el estado de preparación, progreso, minutos y productos sincronizados con el backend.
+   * Parámetros:
+   *   - idCliente (number): ID del cliente.
+   */
+  actualizarPedidoActivo(idCliente: number): void {
+    const pedido = this.pedidoActivo();
+    if (!pedido) return;
+
+    const cleanId = parseInt(pedido.id.replace('#', ''), 10);
+
+    this.http.get<{ exito: boolean; datos: PedidoHistorico[] }>(`${this.apiHost}/historial/${idCliente}`)
+      .subscribe({
+        next: respuesta => {
+          if (respuesta.exito) {
+            this.historialPedidos.set(respuesta.datos);
+
+            const coincidencia = respuesta.datos.find(p => p.id === String(cleanId) || p.id === pedido.id);
+            if (coincidencia) {
+              let progreso = 20;
+              let minutos = 20;
+
+              if (coincidencia.estado === 'Preparando') {
+                progreso = 45;
+                minutos = 15;
+              } else if (coincidencia.estado === 'Listo') {
+                progreso = 85;
+                minutos = 5;
+              } else if (coincidencia.estado === 'Entregado' || coincidencia.estado === 'pagado') {
+                progreso = 100;
+                minutos = 0;
+              } else if (coincidencia.estado === 'cancelado') {
+                progreso = 0;
+                minutos = 0;
+              }
+
+              this.pedidoActivo.set({
+                id: pedido.id,
+                estado: coincidencia.estado,
+                progreso: progreso,
+                minutos: minutos,
+                productos: coincidencia.productos && coincidencia.productos.length > 0 ? coincidencia.productos : pedido.productos,
+                detallesEntrega: pedido.detallesEntrega
+              });
+            }
+          }
+        }
+      });
+  }
+
+  /**
    * Crea un nuevo pedido en la base de datos real.
    * Intención: Registrar la orden y sus detalles en MySQL a través de la API.
    */

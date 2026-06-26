@@ -126,6 +126,9 @@ export class ProcesarCompraComponent implements OnInit {
     const usuario = this.autenticacionService.usuarioActual();
     if (usuario) {
       this.nombreCliente.set(usuario.nombre);
+      if (usuario.telefono) {
+        this.telefonoCliente.set(usuario.telefono);
+      }
     }
 
     // Inicializar mapa si el método por defecto es domicilio

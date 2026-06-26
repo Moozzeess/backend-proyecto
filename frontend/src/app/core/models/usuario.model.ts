@@ -19,4 +19,7 @@ export interface Usuario {
 
   /** Puesto laboral específico para el rol de empleado */
   puesto?: string;
+
+  /** Teléfono de contacto del usuario */
+  telefono?: string;
 }

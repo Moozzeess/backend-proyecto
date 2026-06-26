@@ -41,7 +41,25 @@
                     Iniciar Sesión
                 </button>
             </ng-template>
+
+            <!-- BOTÓN MENÚ MÓVIL (HAMBURGUESA) -->
+            <button 
+                (click)="menuMovilAbierto.set(!menuMovilAbierto())"
+                class="lg:hidden p-2 text-[#d6254d] hover:bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
+                aria-label="Abrir menú">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path *ngIf="!menuMovilAbierto()" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    <path *ngIf="menuMovilAbierto()" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
+    </div>
+
+    <!-- MENÚ MÓVIL DESPLEGABLE -->
+    <div *ngIf="menuMovilAbierto()" class="lg:hidden bg-white border-t border-gray-100 px-6 py-4 flex flex-col gap-3 shadow-inner">
+        <a href="#" (click)="menuMovilAbierto.set(false)" class="font-medium text-gray-700 hover:text-[#d6254d] py-2 no-underline">Inicio</a>
+        <a routerLink="/menu" (click)="menuMovilAbierto.set(false)" class="font-medium text-gray-700 hover:text-[#d6254d] py-2 no-underline">Menú</a>
+        <button (click)="abrirModalHistorial(); menuMovilAbierto.set(false)" class="font-medium text-gray-700 hover:text-[#d6254d] bg-transparent border-none cursor-pointer text-left text-base py-2">Mis Pedidos</button>
     </div>
 </nav>
 

@@ -62,7 +62,8 @@ export class AutenticacionService {
             nombre: `${datos.nombre || ''} ${datos.apellido || ''}`.trim() || datos.correo,
             correo: datos.correo,
             rol: rolFront,
-            puesto: datos.puesto
+            puesto: datos.puesto,
+            telefono: datos.telefono
           };
 
           this.usuarioActual.set(usuario);

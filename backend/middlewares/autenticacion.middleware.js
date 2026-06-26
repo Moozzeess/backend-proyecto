@@ -53,7 +53,8 @@ function verificarToken(peticion, respuesta, siguiente) {
     peticion.usuario = {
       idUsuario: decodificado.idUsuario,
       correo: decodificado.correo,
-      rol: decodificado.rol
+      rol: decodificado.rol,
+      idCliente: decodificado.idCliente
     };
     siguiente();
   } catch (error) {
@@ -144,14 +145,19 @@ function verificarPropietarioOAdmin(nombreParametroId = 'idUsuario') {
       return siguiente();
     }
 
-    // Comparar ID del token con el ID del recurso de la URL
-    if (String(peticion.usuario.idUsuario) !== String(idRecurso)) {
+    // Determinar qué ID comparar basándose en el parámetro de la ruta solicitado
+    const idComparar = nombreParametroId === 'idCliente'
+      ? peticion.usuario.idCliente
+      : peticion.usuario.idUsuario;
+
+    // Comparar ID correspondiente del token con el ID del recurso de la URL
+    if (String(idComparar) !== String(idRecurso)) {
       return respuesta.status(403).json({
         exito: false,
         codigo: 403,
         error: {
           explicacionUsuario: 'No está autorizado para ver o modificar la información de otra cuenta.',
-          explicacionDesarrollador: `Acceso restringido. idUsuario en token (${peticion.usuario.idUsuario}) no coincide con id del recurso (${idRecurso}).`,
+          explicacionDesarrollador: `Acceso restringido. idComparar (${idComparar}) no coincide con id del recurso (${idRecurso}).`,
           descripcionTecnica: 'Aislamiento de recursos violado (Insecure Direct Object Reference prevenido).'
         }
       });

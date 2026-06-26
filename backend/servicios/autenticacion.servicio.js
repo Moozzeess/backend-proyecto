@@ -56,6 +56,7 @@ class AutenticacionServicio {
         idUsuario: usuario.id, 
         correo: usuario.correo, 
         rol: usuario.rol,
+        idCliente: usuario.idCliente,
         jti: identificadorToken
       },
       SECRETO,
@@ -119,6 +120,7 @@ class AutenticacionServicio {
         idUsuario: resultado.id, 
         correo: resultado.correo, 
         rol: resultado.rol,
+        idCliente: resultado.idCliente,
         jti: identificadorToken
       },
       SECRETO,

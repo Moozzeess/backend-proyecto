@@ -47,6 +47,9 @@ export class ClienteComponent implements OnInit, OnDestroy {
   /** Estado de visibilidad del modal del carrito */
   modalAbierto = signal<boolean>(false);
 
+  /** Controla si el menú desplegable móvil del navbar está abierto */
+  menuMovilAbierto = signal<boolean>(false);
+
   /** Información del pedido activo en curso delegada al servicio */
   pedidoActivo = computed(() => this.pedidoService.pedidoActivo());
 
@@ -83,6 +86,9 @@ export class ClienteComponent implements OnInit, OnDestroy {
     private alertasService: AlertasService
   ) {}
 
+  /** Referencia al intervalo de sondeo (polling) del pedido activo */
+  private intervaloPolling: any;
+
   /**
    * Intención: Inicializar el catálogo de productos al montar el componente.
    */
@@ -100,12 +106,39 @@ export class ClienteComponent implements OnInit, OnDestroy {
         this.pedidoService.cargarHistorial(idCliente);
       }
     }
+
+    this.iniciarPollingPedidoActivo();
   }
 
   /**
    * Intención: Limpiar recursos al destruir el componente.
    */
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.detenerPollingPedidoActivo();
+  }
+
+  /**
+   * Intención: Inicializar un temporizador de sondeo que consulta al backend cada 5 segundos si existe un pedido activo.
+   */
+  private iniciarPollingPedidoActivo(): void {
+    this.intervaloPolling = setInterval(() => {
+      if (this.autenticacionService.estaAutenticado()) {
+        const idCliente = this.autenticacionService.idClienteActual();
+        if (idCliente && this.pedidoService.pedidoActivo()) {
+          this.pedidoService.actualizarPedidoActivo(idCliente);
+        }
+      }
+    }, 5000);
+  }
+
+  /**
+   * Intención: Detener y limpiar el temporizador activo para prevenir fugas de memoria.
+   */
+  private detenerPollingPedidoActivo(): void {
+    if (this.intervaloPolling) {
+      clearInterval(this.intervaloPolling);
+    }
+  }
 
 
 
