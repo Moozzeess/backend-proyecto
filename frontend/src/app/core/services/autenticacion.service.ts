@@ -141,6 +141,8 @@ export class AutenticacionService {
     try {
       localStorage.removeItem('pizza-pizza-usuario-sesion');
       localStorage.removeItem('pizza-pizza-id-cliente-sesion');
+      sessionStorage.removeItem('pizza-pizza-empleado-seccion-activa');
+      sessionStorage.removeItem('pizza-pizza-admin-seccion-activa');
     } catch (error) {
       // Casos límite: Acceso a localStorage denegado en eliminación
     }

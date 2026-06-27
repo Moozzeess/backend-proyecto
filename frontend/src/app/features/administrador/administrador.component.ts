@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -100,7 +100,7 @@ export interface FacturaAdmin {
   ],
   templateUrl: './administrador.component.html'
 })
-export class AdministradorComponent implements OnInit {
+export class AdministradorComponent implements OnInit, OnDestroy {
   public servicioPedidos = inject(PedidoService);
   private servicioAlertas = inject(AlertasService);
   private autenticacionService = inject(AutenticacionService);
@@ -168,8 +168,44 @@ export class AdministradorComponent implements OnInit {
   // Estado del Pedido para Facturar
   pedidoParaFacturar: PedidoHistorico | null = null;
 
+  /**
+   * Identificador del proceso de intervalo para refrescar la información administrativa periódicamente.
+   */
+  private intervaloSondeo: any;
+
   ngOnInit(): void {
+    try {
+      const seccionGuardada = sessionStorage.getItem('pizza-pizza-admin-seccion-activa') as typeof this.seccionActiva;
+      if (seccionGuardada) {
+        this.seccionActiva = seccionGuardada;
+      }
+    } catch (e) {
+      // Caso límite: error al leer sessionStorage
+    }
     this.cargarDatosAdministrador();
+    this.iniciarSondeoDatos();
+  }
+
+  /**
+   * Intención: Limpiar el temporizador de sondeo de administración para prevenir fugas de memoria.
+   */
+  ngOnDestroy(): void {
+    if (this.intervaloSondeo) {
+      clearInterval(this.intervaloSondeo);
+    }
+  }
+
+  /**
+   * Intención: Iniciar el sondeo automático de los datos para reflejar los cambios administrativos asíncronos.
+   */
+  private iniciarSondeoDatos(): void {
+    try {
+      this.intervaloSondeo = setInterval(() => {
+        this.cargarDatosAdministrador();
+      }, 5000);
+    } catch (e) {
+      // Caso límite: error al establecer intervalo
+    }
   }
 
   /**
@@ -226,6 +262,11 @@ export class AdministradorComponent implements OnInit {
 
   cambiarSeccion(seccion: typeof this.seccionActiva): void {
     this.seccionActiva = seccion;
+    try {
+      sessionStorage.setItem('pizza-pizza-admin-seccion-activa', seccion);
+    } catch (e) {
+      // Caso límite: cuotas o restricciones de sessionStorage superadas
+    }
   }
 
   // Notificaciones de Alertas

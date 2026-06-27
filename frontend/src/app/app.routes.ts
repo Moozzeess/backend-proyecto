@@ -45,6 +45,10 @@ export const routes: Routes = [
   {
     path: 'facturacion',
     component: FacturacionComponent
+  },
+  {
+    path: '**',
+    redirectTo: ''
   }
 ];
 

@@ -7,6 +7,7 @@ const { probarConexion } = require('./configuracion/conexion');
 const { inicializarTablas } = require('./configuracion/inicializarTablas');
 const registrador = require('./utilidades/registrador.utilidad');
 const registrarSolicitud = require('./middlewares/solicitudes.middleware');
+const limitadorSolicitudes = require('./middlewares/limitador.middleware');
 const manejadorErroresGlobal = require('./middlewares/error.middleware');
 const CorreoServicio = require('./servicios/correo.servicio');
 
@@ -23,6 +24,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(registrarSolicitud);
+app.use(limitadorSolicitudes);
 
 // Rutas de la API global
 const rutasDeLaApi = require('./rutas/indice.rutas');

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AutenticacionService } from '../../core/services/autenticacion.service';
@@ -41,7 +41,7 @@ import { VistaVentasSucursalComponent } from './components/vista-ventas-sucursal
   ],
   templateUrl: './empleado.component.html'
 })
-export class EmpleadoComponent implements OnInit {
+export class EmpleadoComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);
   private pedidoService = inject(PedidoService);
   private inventarioService = inject(InventarioService);
@@ -89,6 +89,11 @@ export class EmpleadoComponent implements OnInit {
    * Intención: Inicializar datos base reales para pedidos, inventario y notificaciones al cargar el componente.
    * Retorno: void.
    */
+  /**
+   * Identificador del proceso de intervalo para refrescar la información periódicamente.
+   */
+  private intervaloSondeo: any;
+
   ngOnInit(): void {
     // Obtener datos reales del empleado logueado
     const usuarioLogueado = this.autenticacionService.usuarioActual();
@@ -96,19 +101,47 @@ export class EmpleadoComponent implements OnInit {
       this.nombreEmpleado = usuarioLogueado.nombre;
       this.puestoEmpleado = usuarioLogueado.puesto || 'Cajero General';
       
-      // Asignar sección activa inicial basada en el cargo/puesto
-      if (this.puestoEmpleado === 'Chef Pizzero') {
-        this.seccionActiva = 'cocina';
-      } else if (this.puestoEmpleado === 'Repartidor Motociclista') {
-        this.seccionActiva = 'entregas';
-      } else if (this.puestoEmpleado === 'Cajero General') {
-        this.seccionActiva = 'pedidos';
+      // Intentar recuperar sección activa previa de sessionStorage
+      const seccionGuardada = sessionStorage.getItem('pizza-pizza-empleado-seccion-activa') as typeof this.seccionActiva;
+      if (seccionGuardada) {
+        this.seccionActiva = seccionGuardada;
       } else {
-        this.seccionActiva = 'pedidos';
+        // Asignar sección activa inicial basada en el cargo/puesto de manera flexible e inclusiva
+        const puestoNormalizado = this.puestoEmpleado.toLowerCase();
+        if (puestoNormalizado.includes('chef') || puestoNormalizado.includes('cocina') || puestoNormalizado.includes('cocinero')) {
+          this.seccionActiva = 'cocina';
+        } else if (puestoNormalizado.includes('repartidor') || puestoNormalizado.includes('entrega') || puestoNormalizado.includes('motociclista')) {
+          this.seccionActiva = 'entregas';
+        } else {
+          this.seccionActiva = 'pedidos';
+        }
       }
     }
 
     this.cargarDatosReales();
+    this.iniciarSondeoDatos();
+  }
+
+  /**
+   * Intención: Limpiar el temporizador de sondeo para prevenir fugas de memoria.
+   */
+  ngOnDestroy(): void {
+    if (this.intervaloSondeo) {
+      clearInterval(this.intervaloSondeo);
+    }
+  }
+
+  /**
+   * Intención: Iniciar el sondeo automático de los datos para reflejar los cambios asíncronos.
+   */
+  private iniciarSondeoDatos(): void {
+    try {
+      this.intervaloSondeo = setInterval(() => {
+        this.cargarDatosReales();
+      }, 5000);
+    } catch (e) {
+      // Caso límite: error al establecer intervalo
+    }
   }
 
   /**
@@ -208,6 +241,11 @@ export class EmpleadoComponent implements OnInit {
    */
   cambiarSeccion(seccion: typeof this.seccionActiva): void {
     this.seccionActiva = seccion;
+    try {
+      sessionStorage.setItem('pizza-pizza-empleado-seccion-activa', seccion);
+    } catch (e) {
+      // Caso límite: cuotas o restricciones de sessionStorage superadas
+    }
   }
 
   /**
