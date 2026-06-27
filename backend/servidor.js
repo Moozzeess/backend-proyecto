@@ -10,12 +10,16 @@ const registrarSolicitud = require('./middlewares/solicitudes.middleware');
 const limitadorSolicitudes = require('./middlewares/limitador.middleware');
 const manejadorErroresGlobal = require('./middlewares/error.middleware');
 const CorreoServicio = require('./servicios/correo.servicio');
+const swaggerUi = require('swagger-ui-express');
+const especificacionSwagger = require('./configuracion/swagger');
 
 const app = express();
 const PUERTO = process.env.PUERTO || 3000;
 
 // Aplicar middlewares de seguridad y análisis del cuerpo de la petición
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 // Configuración de CORS dinámica y segura para producción (Render) y desarrollo
 const origenPermitido = process.env.FRONTEND_URL || '*';
 app.use(cors({
@@ -25,6 +29,8 @@ app.use(cors({
 app.use(express.json());
 app.use(registrarSolicitud);
 app.use(limitadorSolicitudes);
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(especificacionSwagger));
 
 // Rutas de la API global
 const rutasDeLaApi = require('./rutas/indice.rutas');
